@@ -13,6 +13,7 @@
 
 static struct primitive* prim_funs;
 static int prim_fun_count = 0;
+static struct primitive default_primitive;
 
 static CHAR* get_arg(struct ARGS* args, int i)
 {
@@ -34,15 +35,15 @@ static void value(int where, struct TRAC* trac, CHAR* s, int len)
     }
 }
 
-static CHAR** make_fargs(struct ARGS* args, int* fnargs)
+static CHAR** make_fargs(struct ARGS* args, int* fnargs, int start)
 {
     CHAR** fargs = 0;
     *fnargs = 0;
-    if (args->n > 2) {
-        *fnargs = args->n-2;
+    if (args->n > start) {
+        *fnargs = args->n-start;
         fargs = malloc(sizeof(CHAR*)*(*fnargs));
         for (int i = 0; i < *fnargs; i++) {
-            fargs[i] = get_arg(args, i+2);
+            fargs[i] = get_arg(args, i+start);
         }
     }
     return fargs;
@@ -50,11 +51,11 @@ static CHAR** make_fargs(struct ARGS* args, int* fnargs)
 
 static int prim_cl(struct TRAC* trac, struct ARGS* args)
 {
-    CHAR* name = get_arg(args, 1);
+    CHAR* name = toupper_string(get_arg(args, 1));
     struct form* form = form_lookup(trac->forms, name);
     if (form) {
         int fnargs = 0;
-        CHAR** fargs = make_fargs(args, &fnargs);
+        CHAR** fargs = make_fargs(args, &fnargs, 2);
         CHAR* s = form_get(form, fargs, fnargs);
         free(fargs);
         value(args->to, trac, s, strlen((char*)s));
@@ -65,7 +66,7 @@ static int prim_cl(struct TRAC* trac, struct ARGS* args)
 
 static int prim_ds(struct TRAC* trac, struct ARGS* args)
 {
-    CHAR* name = get_arg(args, 1);
+    CHAR* name = toupper_string(get_arg(args, 1));
     CHAR* s = get_arg(args, 2);
     form_define(trac->forms, name, s, strlen((char*)s));
     return 0;
@@ -100,13 +101,28 @@ static int prim_rs(struct TRAC* trac, struct ARGS* args)
 
 static int prim_ss(struct TRAC* trac, struct ARGS* args)
 {
-    CHAR* name = get_arg(args, 1);
+    CHAR* name = toupper_string(get_arg(args, 1));
     struct form* form = form_lookup(trac->forms, name);
     if (form) {
         int fnargs = 0;
-        CHAR** fargs = make_fargs(args, &fnargs);
+        CHAR** fargs = make_fargs(args, &fnargs, 2);
         form_ss(form, fargs, fnargs);
         free(fargs);
+    }
+    return 0;
+}
+
+static int prim_default(struct TRAC* trac, struct ARGS* args)
+{
+    CHAR* name = toupper_string(get_arg(args, 0));
+    struct form* form = form_lookup(trac->forms, name);
+    if (form) {
+        int fnargs = 0;
+        CHAR** fargs = make_fargs(args, &fnargs, 1);
+        CHAR* s = form_get(form, fargs, fnargs);
+        free(fargs);
+        value(args->to, trac, s, strlen((char*)s));
+        free(s);
     }
     return 0;
 }
@@ -129,6 +145,7 @@ struct primitive* lookup_primitive(CHAR* name)
     struct primitive* primitive;
     primitive = bsearch(name, prim_funs, prim_fun_count,
                         sizeof(struct primitive), prim_compare);
+    if (!primitive) primitive = &default_primitive;
     return primitive;
 }
 
@@ -141,4 +158,6 @@ void primitives_init()
     reg_prim_fun("PS", prim_ps);
     reg_prim_fun("RS", prim_rs);
     reg_prim_fun("SS", prim_ss);
+    default_primitive.name = (CHAR*)"";
+    default_primitive.fun = prim_default;
 }
