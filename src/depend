@@ -1,0 +1,22 @@
+active_buf.o: active_buf.c active_buf.h common.h
+ansi.o: ansi.c ansi.h
+common.o: common.c common.h
+forms.o: forms.c forms.h common.h string_buf.h
+io.o: io.c io.h string_buf.h common.h
+neutral_buf.o: neutral_buf.c neutral_buf.h common.h
+primitives.o: primitives.c ansi.h io.h string_buf.h common.h primitives.h \
+ trac.h active_buf.h neutral_buf.h
+string_buf.o: string_buf.c string_buf.h common.h
+trac64.o: trac64.c active_buf.h common.h ansi.h forms.h io.h string_buf.h \
+ neutral_buf.h primitives.h trac.h version.h
+active_buf.o: active_buf.h common.h
+ansi.o: ansi.h
+common.o: common.h
+forms.o: forms.h common.h
+io.o: io.h string_buf.h common.h
+neutral_buf.o: neutral_buf.h common.h
+primitives.o: primitives.h trac.h active_buf.h common.h neutral_buf.h \
+ string_buf.h
+string_buf.o: string_buf.h common.h
+trac.o: trac.h active_buf.h common.h neutral_buf.h string_buf.h
+version.o: version.h
