@@ -28,6 +28,6 @@ int echar_is_arg(ECHAR echar);
 
 ECHAR echar_set_arg(ECHAR echar);
 
-void toupper_string(CHAR* p);
+CHAR* toupper_string(CHAR* p);
 
 #endif

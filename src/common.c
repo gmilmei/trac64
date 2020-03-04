@@ -56,10 +56,12 @@ ECHAR echar_set_arg(ECHAR echar)
     return echar|0x8000;
 }
 
-void toupper_string(CHAR* p)
+CHAR* toupper_string(CHAR* p)
 {
-    while (*p) {
-        *p = toupper(*p);
-        p++;
+    CHAR* s = p;
+    while (*s) {
+        *s = toupper(*s);
+        s++;
     }
+    return p;
 }
