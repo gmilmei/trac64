@@ -426,7 +426,29 @@ static int prim_hl(TRAC* trac, ARGS* args)
 
 static int prim_mo(TRAC* trac, ARGS* args)
 {
-    // TODO
+    if (args->n == 1) {
+        primitives_init(0);
+        fprintf(stdout, "<T64>");
+        fflush(stdout);
+    }
+    else if (args->n > 1) {
+        CHAR* s = get_arg(args, 1);
+        int i = 0;
+        while (s[i]) {
+            s[i] = toupper(s[i]);
+            i++;
+        }
+        if (strcmp(c(s), "E") == 0) {
+            primitives_init(1);
+        }
+        else if (strcmp(c(s), "COLOR") == 0) {
+            set_ansi(1);
+        }
+        else if (strcmp(c(s), "NOCOLOR") == 0) {
+            set_ansi(0);
+        }
+    }
+
     return 0;
 }
 
@@ -492,6 +514,7 @@ primitive* lookup_primitive(CHAR* name)
 
 void primitives_init(int ext)
 {
+    prim_count = 0;
     prims = calloc(MAX_PRIM, sizeof(primitive));
     if (ext) reg_prim("??", prim_help);
     reg_prim("AD", prim_ad);
