@@ -1,3 +1,4 @@
+NAME=trac64-1.0
 BINDIR=/usr/bin
 MANDIR=/usr/share/man
 
@@ -12,5 +13,12 @@ install: all
 	mkdir -p $(DESTDIR)$(MANDIR)/man1
 	install -m0644 man/trac64.1 $(DESTDIR)$(MANDIR)/man1/trac64.1
 
+tar: clean
+	mkdir -p ${NAME}
+	cp -a AUTHORS LICENSE Makefile README.md src man ${NAME}
+	tar zcf ${NAME}.tar.gz --owner=0 --group=0 ${NAME}
+	rm -rf ${NAME}
+
 clean:
 	make -C src clean
+	rm -fr ${NAME}
