@@ -15,4 +15,6 @@ void io_out(int fd, CHAR* s, int len);
 
 CHAR io_char(int fd);
 
+CHAR* read_file(char* filename);
+
 #endif

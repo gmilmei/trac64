@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include "active_buf.h"
 #include "ansi.h"
@@ -46,8 +47,11 @@ static void args_init(ARGS* args)
     args->n = 0;
 }
 
-int run()
+int run(CHAR* script)
 {
+
+    if (!script) script = idle_script;
+    
     TRAC trac;
     ARGS args;
     trac_init(&trac);
@@ -58,7 +62,8 @@ int run()
 
     for (;;) {
         active_buf_clear(abuf);
-        active_buf_prepend(abuf, idle_script, -1);
+        active_buf_prepend(abuf, script, -1);
+        script = idle_script;
         while (abuf->top >= 0) {
             print_buffers(&trac);
             CHAR c = abuf->buf[abuf->top];
@@ -187,12 +192,57 @@ int run()
 
 int main(int argc, char* argv[])
 {
+    int opt;
+    int ansi = 0;
+    int ext = 0;
+    int quiet = 0;
+    char* script_file = 0;
+    CHAR* script = 0;
+    char* alt_idle_script_file = 0;
+    
+    while ((opt = getopt(argc, argv, "qcei:")) != -1) {
+        switch (opt) {
+        case 'c':
+            ansi = 1;
+            break;
+        case 'e':
+            ext = 1;
+            break;
+        case 'q':
+            quiet = 1;
+            break;
+        case 'i':
+            alt_idle_script_file = strdup(optarg);
+            break;
+        default:
+            break;
+        }
+    }
+
+    script_file = argv[optind];
+    if (script_file) {
+        script = read_file(script_file);
+        if (!script) {
+            perror("trac64");
+            exit(1);
+        }
+    }
+
+    if (alt_idle_script_file) {
+        // TODO
+    }
+    
     io_init();
-    primitives_init(1);
-    set_ansi(1);
-    ansi_fg(STDOUT_FILENO, "92");
-    printf("%s %s\n", "TRAC T-64", VERSION_STRING);
-    ansi_reset(STDOUT_FILENO);
-    run();
+    primitives_init(ext);
+    set_ansi(ansi);
+
+    if (!quiet) {
+        ansi_fg(STDOUT_FILENO, "92");
+        printf("%s %s\n", "TRAC T-64", VERSION_STRING);
+        ansi_reset(STDOUT_FILENO);
+    }
+
+    run(script);
+
     return 0;
 }

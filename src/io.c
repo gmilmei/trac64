@@ -117,3 +117,22 @@ CHAR io_char(int fd)
     cooked(fd, &saved_term);
     return (CHAR)c;
 }
+
+CHAR* read_file(char* filename)
+{
+    CHAR* data = 0;
+    FILE* file = fopen(filename, "r");
+    if (file) {
+        char b[1024];
+        string_buf* sbuf = string_buf_new(1024);
+        int len;
+        while ((len = fread(b, sizeof(char), 1024, file)) > 0) {
+            string_buf_append_chars(sbuf, b, len);
+        }
+        string_buf_add(sbuf, 0);
+        data = sbuf->buf;
+        sbuf->buf = 0;
+        string_buf_free(sbuf);
+    }
+    return data;
+}

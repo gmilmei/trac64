@@ -43,6 +43,19 @@ void string_buf_append(string_buf* sbuf, CHAR* s)
     sbuf->buf[sbuf->len] = 0;
 }
 
+void string_buf_append_chars(string_buf* sbuf, char* s, int len)
+{    
+    while (sbuf->max < sbuf->len+len+1) {
+        sbuf->max *= 2;
+        sbuf->buf = realloc(sbuf->buf, (sbuf->max+1)*sizeof(CHAR));
+    }
+    for (int i = 0; i < len; i++) {
+        sbuf->buf[sbuf->len] = s[i];
+        sbuf->len++;
+    }
+    sbuf->buf[sbuf->len] = 0;
+}
+
 void string_buf_append_number(string_buf* sbuf, long n)
 {
     int p = sbuf->len;
