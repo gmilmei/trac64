@@ -64,10 +64,11 @@ void string_buf_append_number(string_buf* sbuf, long n)
     }
 
     int len = sbuf->len-p;
-
     for (int i = 0; i < len/2; i++) {
-        CHAR c = sbuf->buf[i];
-        sbuf->buf[i] = sbuf->buf[len-i-1];
-        sbuf->buf[len-i-1] = c;
+        int j = sbuf->len-i-1;
+        int k = p+i;
+        CHAR c = sbuf->buf[k];
+        sbuf->buf[k] = sbuf->buf[j];
+        sbuf->buf[j] = c;
     }
 }

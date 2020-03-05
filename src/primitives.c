@@ -51,7 +51,7 @@ static CHAR** make_fargs(ARGS* args, int* fnargs, int start)
     return fargs;
 }
 
-static void prim_arith_get_args(TRAC* trac, ARGS* args, long* n1, long *n2) {
+static CHAR* prim_arith_get_args(TRAC* trac, ARGS* args, long* n1, long *n2) {
     CHAR* a1 = get_arg(args, 1);
     CHAR* a2 = get_arg(args, 2);
     int s1 = 0;
@@ -60,14 +60,16 @@ static void prim_arith_get_args(TRAC* trac, ARGS* args, long* n1, long *n2) {
     int s2 = 0;
     *n2 = parse_number(a2, &s2);
     if (s2 < 0) *n2 *= -1;
+    return a1;
 }
 
 static int prim_ad(TRAC* trac, ARGS* args)
 {
     long n1, n2;
-    prim_arith_get_args(trac, args, &n1, &n2);
+    CHAR* p = prim_arith_get_args(trac, args, &n1, &n2);
     long n = n1+n2;
     string_buf* sbuf = string_buf_new(128);
+    string_buf_append(sbuf, p);
     string_buf_append_number(sbuf, n);
     value(args->to, trac, sbuf->buf, sbuf->len);
     string_buf_free(sbuf);
@@ -77,9 +79,10 @@ static int prim_ad(TRAC* trac, ARGS* args)
 static int prim_su(TRAC* trac, ARGS* args)
 {
     long n1, n2;
-    prim_arith_get_args(trac, args, &n1, &n2);
+    CHAR* p = prim_arith_get_args(trac, args, &n1, &n2);
     long n = n1-n2;
     string_buf* sbuf = string_buf_new(128);
+    string_buf_append(sbuf, p);
     string_buf_append_number(sbuf, n);
     value(args->to, trac, sbuf->buf, sbuf->len);
     string_buf_free(sbuf);
@@ -89,9 +92,10 @@ static int prim_su(TRAC* trac, ARGS* args)
 static int prim_ml(TRAC* trac, ARGS* args)
 {
     long n1, n2;
-    prim_arith_get_args(trac, args, &n1, &n2);
+    CHAR* p = prim_arith_get_args(trac, args, &n1, &n2);
     long n = n1*n2;
     string_buf* sbuf = string_buf_new(128);
+    string_buf_append(sbuf, p);
     string_buf_append_number(sbuf, n);
     value(args->to, trac, sbuf->buf, sbuf->len);
     string_buf_free(sbuf);
@@ -101,7 +105,7 @@ static int prim_ml(TRAC* trac, ARGS* args)
 static int prim_dv(TRAC* trac, ARGS* args)
 {
     long n1, n2;
-    prim_arith_get_args(trac, args, &n1, &n2);
+    CHAR* p = prim_arith_get_args(trac, args, &n1, &n2);
     if (n2 == 0) {
         CHAR* ex = get_arg(args, 3);
         value(args->to, trac, ex, strlen(c(ex)));
@@ -109,6 +113,7 @@ static int prim_dv(TRAC* trac, ARGS* args)
     }
     long n = n1/n2;
     string_buf* sbuf = string_buf_new(128);
+    string_buf_append(sbuf, p);
     string_buf_append_number(sbuf, n);
     value(args->to, trac, sbuf->buf, sbuf->len);
     string_buf_free(sbuf);
