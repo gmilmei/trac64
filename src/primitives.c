@@ -166,13 +166,29 @@ static int prim_cl(TRAC* trac, ARGS* args)
 
 static int prim_cr(TRAC* trac, ARGS* args)
 {
-    // TODO
+    if (args->n > 1) {
+        CHAR* name = get_arg(args, 1);
+        form* f = form_lookup(trac->forms, name);
+        if (f) f->ptr = 0;
+    }
     return 0;
 }
 
 static int prim_cc(TRAC* trac, ARGS* args)
 {
-    // TODO
+    if (args->n > 1) {
+        CHAR* name = get_arg(args, 1);
+        CHAR* z = get_arg(args, 2);
+        form* f = form_lookup(trac->forms, name);
+        if (f) {
+            CHAR c;
+            int end = form_cc(f, &c);
+            if (end)
+                value(args->to, trac, z, strlen(c(z)));
+            else
+                value(args->to, trac, &c, 1);
+        }
+    }
     return 0;
 }
 
@@ -254,6 +270,7 @@ static int prim_dv(TRAC* trac, ARGS* args)
     long n1, n2;
     CHAR* p = prim_arith_get_args(trac, args, &n1, &n2);
     if (n2 == 0) {
+        // TODO
         CHAR* ex = get_arg(args, 3);
         value(args->to, trac, ex, strlen(c(ex)));
         return 0;

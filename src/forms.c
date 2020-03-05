@@ -48,6 +48,7 @@ CHAR* form_get(form* f, CHAR** fargs, int fnargs)
 
 void form_ss(form* f, CHAR** fargs, int fnargs)
 {
+    f->ptr = 0;
     ECHAR* new_buf = malloc(f->len*sizeof(ECHAR));
     int j = 0;
     int len = f->len;
@@ -74,6 +75,21 @@ void form_ss(form* f, CHAR** fargs, int fnargs)
     }
     free(f->buf);
     f->buf = new_buf;
+}
+
+int form_cc(form* f, CHAR* c)
+{
+    if (f->ptr == f->len) return 1;
+    while (f->ptr < f->len) {
+        if (echar_is_gap(f->buf[f->ptr])) {
+            f->ptr++;
+            continue;
+        }
+        *c = ec_to_c(f->buf[f->ptr]);
+        f->ptr++;
+        return 0;
+    }
+    return 1;
 }
 
 void form_print(FILE* file, form* f)

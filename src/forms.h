@@ -29,6 +29,8 @@ CHAR* form_get(form* f, CHAR** fargs, int fnargs);
 
 void form_ss(form* f, CHAR** fargs, int fnargs);
 
+int form_cc(form* f, CHAR* c);
+
 void form_delete(forms* fs, const CHAR* name);
 
 form* form_lookup(forms* fs, const CHAR* name);
