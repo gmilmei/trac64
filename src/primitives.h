@@ -10,7 +10,7 @@ typedef struct {
     primitive_function fun;
 } primitive;
 
-void primitives_init();
+void primitives_init(int ext);
 
 primitive* lookup_primitive(CHAR* name);
 

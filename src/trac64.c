@@ -188,7 +188,7 @@ int run()
 int main(int argc, char* argv[])
 {
     io_init();
-    primitives_init();
+    primitives_init(1);
     set_ansi(1);
     ansi_fg(STDOUT_FILENO, "92");
     printf("%s %s\n", "TRAC T-64", VERSION_STRING);

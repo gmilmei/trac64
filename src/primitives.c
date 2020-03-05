@@ -6,6 +6,7 @@
 #include "ansi.h"
 #include "io.h"
 #include "primitives.h"
+#include "help.h"
 
 #define MAX_PRIM 100
 
@@ -396,6 +397,18 @@ static int prim_default(TRAC* trac, ARGS* args)
     return 0;
 }
 
+/*
+ * Extensions.
+ */
+
+static int prim_help(TRAC* trac, ARGS* args)
+{
+    write(trac->fd_out, "\n", 1);
+    write(trac->fd_out, help_txt, help_txt_len);
+    return 0;
+}
+
+
 static void reg_prim(const char* name, primitive_function fun)
 {
     prims[prim_count].name = C(name);
@@ -426,9 +439,10 @@ primitive* lookup_primitive(CHAR* name)
     return p;
 }
 
-void primitives_init()
+void primitives_init(int ext)
 {
     prims = calloc(MAX_PRIM, sizeof(primitive));
+    if (ext) reg_prim("??", prim_help);
     reg_prim("AD", prim_ad);
     reg_prim("BC", prim_bc);
     reg_prim("BI", prim_bi);

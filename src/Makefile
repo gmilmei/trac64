@@ -17,6 +17,9 @@ all: trac64
 
 trac64: ${OBJS}
 
+help.h: help.txt
+	xxd -i help.txt > help.h
+
 clean:
 	rm -f ${OBJS} trac64 TAGS
 
