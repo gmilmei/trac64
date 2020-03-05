@@ -1,0 +1,34 @@
+.TH TRAC64 1 "5  March 2020" "TRAC T-64 1.0" "User Commands"
+.SH NAME
+trac64 \- TRAC T-64 processor
+
+.SH SYNOPSIS
+.B trac64
+[\fI\,OPTION\/\fR]... [\fI\,FILE\/\fR]
+
+Start the TRAC T-64 processor.
+
+.SH DESCRIPTION
+
+A processor for the TRAC T-64 interactive macro
+programming language.
+
+When \fI\,FILE\/\fR is present, then \fI\,FILE\/\fR is read and executed.
+Then the idle script is run as usual.
+
+.SH OPTIONS
+.TP
+\fB\-e\fR
+enable some extensions
+.TP
+\fB\-c\fR
+enable ANSI coloring of the output
+.TP
+\fB\-q\fR
+do not print the banner
+.TP
+\fB\-i\fR \fI\,FILE\/\fR
+use the content of \fI\,FILE\/\fR as the idle script
+
+.SH AUTHOR
+Written by Gérard Milmeister
