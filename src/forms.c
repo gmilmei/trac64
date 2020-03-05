@@ -29,7 +29,7 @@ void form_free(form* f)
 CHAR* form_get(form* f, CHAR** fargs, int fnargs)
 {
     string_buf* sbuf = string_buf_new(f->len*2);
-    for (int i = 0; i < f->len; i++) {
+    for (int i = f->ptr; i < f->len; i++) {
         ECHAR ec = f->buf[i];
         if (echar_is_gap(ec)) {
             int n = echar_get_number(ec);
@@ -102,6 +102,23 @@ void forms_free(forms* fs)
     // TODO
 }
 
+void forms_clear(forms* fs)
+{
+    for (int i = 0; i < fs->size; i++) {
+        form* f = fs->table[i];
+        if (f) form_free(f);
+    }
+    fs->size = 0;
+}
+
+void forms_print(FILE* file, forms* fs)
+{
+    for (int i = 0; i < fs->size; i++) {
+        form_print(file, fs->table[i]);
+        fprintf(file, "\n");
+    }
+}
+
 static int form_compare(const void* a, const void* b)
 {
     const form* const *af = a;
@@ -167,12 +184,4 @@ void form_define(forms* fs, const CHAR* name, const CHAR* s, int len)
     fs->table[fs->size] = f;
     fs->size++;
     forms_sort(fs);
-}
-
-void forms_print(FILE* file, forms* fs)
-{
-    for (int i = 0; i < fs->size; i++) {
-        form_print(file, fs->table[i]);
-        fprintf(file, "\n");
-    }
 }

@@ -21,13 +21,15 @@ forms* forms_new(int max);
 
 void forms_free(forms* fs);
 
-void forms_print(FILE* f, forms* forms);
+void forms_clear(forms* fs);
+
+void forms_print(FILE* f, forms* fs);
 
 CHAR* form_get(form* f, CHAR** fargs, int fnargs);
 
 void form_ss(form* f, CHAR** fargs, int fnargs);
 
-void form_delete(forms* ffs, const CHAR* name);
+void form_delete(forms* fs, const CHAR* name);
 
 form* form_lookup(forms* fs, const CHAR* name);
 

@@ -111,13 +111,16 @@ static int prim_ds(TRAC* trac, ARGS* args)
 
 static int prim_dd(TRAC* trac, ARGS* args)
 {
-    // TODO
+    for (int i = 1; i < args->n; i++) {
+        CHAR* name = get_arg(args, i);
+        form_delete(trac->forms, name);
+    }
     return 0;
 }
 
 static int prim_da(TRAC* trac, ARGS* args)
 {
-    // TODO
+    forms_clear(trac->forms);               
     return 0;
 }
 
