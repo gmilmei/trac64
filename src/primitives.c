@@ -377,7 +377,29 @@ static int prim_ln(TRAC* trac, ARGS* args)
 
 static int prim_pf(TRAC* trac, ARGS* args)
 {
-    // TODO
+    CHAR* name = get_arg(args, 1);
+    form* f = form_lookup(trac->forms, name);
+    if (f) {
+        ECHAR* s = f->buf;
+        int i;
+        for (i = 0; i < f->len; i++) {
+            if (i == f->ptr) {
+                fprintf(stdout, "<^>");
+            }
+            ECHAR ec = s[i];
+            if (echar_is_gap(ec)) {
+                fprintf(stdout, "<%d>", echar_get_number(ec));
+            }
+            else {
+                CHAR c = ec_to_c(ec);
+                fprintf(stdout, "%c", c);
+            }
+        }
+        if (f->ptr == f->len) {
+            fprintf(stdout, "<^>");
+        }
+        fflush(stdout);
+    }
     return 0;
 }
 
