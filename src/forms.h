@@ -4,35 +4,35 @@
 #include <stdio.h>
 #include "common.h"
 
-struct form {
+typedef struct {
     CHAR* name;
     ECHAR* buf;
     int len;
     int ptr;
-};
+} form;
 
-struct forms {
-    struct form** table;
+typedef struct {
+    form** table;
     int max;
     int size;
-};
+} forms;
 
-struct forms* forms_new(int max);
+forms* forms_new(int max);
 
-void forms_free(struct forms*);
+void forms_free(forms* fs);
 
-void forms_print(FILE* f, struct forms* forms);
+void forms_print(FILE* f, forms* forms);
 
-CHAR* form_get(struct form* form, CHAR** fargs, int fnargs);
+CHAR* form_get(form* f, CHAR** fargs, int fnargs);
 
-void form_ss(struct form* form, CHAR** fargs, int fnargs);
+void form_ss(form* f, CHAR** fargs, int fnargs);
 
-void form_delete(struct forms* forms, const CHAR* name);
+void form_delete(forms* ffs, const CHAR* name);
 
-struct form* form_lookup(struct forms*, const CHAR* name);
+form* form_lookup(forms* fs, const CHAR* name);
 
-void form_define(struct forms*, const CHAR* name, const CHAR* s, int len);
+void form_define(forms* fs, const CHAR* name, const CHAR* s, int len);
 
-void form_print(FILE* file, struct form* form);
+void form_print(FILE* file, form* f);
 
 #endif

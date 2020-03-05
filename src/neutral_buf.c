@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include "neutral_buf.h"
 
-struct neutral_buf* neutral_buf_new(int max)
+neutral_buf* neutral_buf_new(int max)
 {
-    struct neutral_buf* nbuf = calloc(1, sizeof(struct neutral_buf));
+    neutral_buf* nbuf = calloc(1, sizeof(neutral_buf));
     nbuf->buf = calloc(max, sizeof(ECHAR));
     nbuf->max = max;
     nbuf->top = -1;
@@ -14,13 +14,13 @@ struct neutral_buf* neutral_buf_new(int max)
     return nbuf;
 }
 
-void neutral_buf_free(struct neutral_buf* nbuf)
+void neutral_buf_free(neutral_buf* nbuf)
 {
     free(nbuf->buf);
     free(nbuf);
 }
 
-void neutral_buf_add(struct neutral_buf* nbuf, ECHAR c)
+void neutral_buf_add(neutral_buf* nbuf, ECHAR c)
 {
     nbuf->top++;
     if (nbuf->top >= nbuf->max) {
@@ -30,22 +30,22 @@ void neutral_buf_add(struct neutral_buf* nbuf, ECHAR c)
     nbuf->buf[nbuf->top] = c;
 }
 
-void neutral_buf_print(FILE* f, struct neutral_buf* nbuf)
+void neutral_buf_print(FILE* file, neutral_buf* nbuf)
 {
     for (int i = 0; i <= nbuf->top; i++) {
         ECHAR ec = nbuf->buf[i];
         if (echar_is_aprim(ec))
-            fprintf(f, "[#%d]", echar_get_number(ec));
+            fprintf(file, "[#%d]", echar_get_number(ec));
         else if (echar_is_nprim(ec))
-            fprintf(f, "[##%d]", echar_get_number(ec));
+            fprintf(file, "[##%d]", echar_get_number(ec));
         else if (echar_is_arg(ec))
-            fprintf(f, "[%d]", echar_get_number(ec));
+            fprintf(file, "[%d]", echar_get_number(ec));
         else {
-            CHAR c = echar_to_char(ec);
+            CHAR c = ec_to_c(ec);
             if (c == '\n')
-                fprintf(f, "\\n");
+                fprintf(file, "\\n");
             else
-                fprintf(f, "%c", echar_to_char(ec));
+                fprintf(file, "%c", ec_to_c(ec));
         }
     }
 }

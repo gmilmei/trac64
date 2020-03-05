@@ -6,10 +6,10 @@
 #include "string_buf.h"
 #include "forms.h"
 
-struct TRAC {
-    struct active_buf* abuf;
-    struct neutral_buf* nbuf;
-    struct forms* forms;
+typedef struct {
+    active_buf* abuf;
+    neutral_buf* nbuf;
+    forms* forms;
 
     CHAR meta_char;
     CHAR delete_char;
@@ -17,16 +17,16 @@ struct TRAC {
 
     int fd_in;
     int fd_out;
-};
+} TRAC;
 
 #define TO_ACTIVE 0
 #define TO_NEUTRAL 1
 
-struct ARGS {
-    struct string_buf* buf;
+typedef struct {
+    string_buf* buf;
     int pos[1024];
     int n;
     int to;
-};
+} ARGS;
 
 #endif

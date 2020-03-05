@@ -2,41 +2,41 @@
 #include <string.h>
 #include "active_buf.h"
 
-struct active_buf* active_buf_new(int max)
+active_buf* active_buf_new(int max)
 {
-    struct active_buf* abuf = calloc(1, sizeof(struct active_buf));
+    active_buf* abuf = calloc(1, sizeof(active_buf));
     abuf->buf = calloc(max, sizeof(CHAR));
     abuf->max = max;
     abuf->top = -1;
     return abuf;
 }
 
-void active_buf_free(struct active_buf* abuf)
+void active_buf_free(active_buf* abuf)
 {
     free(abuf->buf);
     free(abuf);
 }
 
-void active_buf_clear(struct active_buf* abuf)
+void active_buf_clear(active_buf* abuf)
 {
     abuf->top = -1;
 }
 
-int active_buf_is_empty(struct active_buf* abuf)
+int active_buf_is_empty(active_buf* abuf)
 {
     return abuf->top < 0;
 }
 
 
-void active_buf_prepend(struct active_buf* abuf, CHAR* s, int len)
+void active_buf_prepend(active_buf* abuf, CHAR* s, int len)
 {
-    if (len < 0) len = strlen((char*)s);
+    if (len < 0) len = strlen(c(s));
     for (int i = len-1; i >= 0; i--) {
         active_buf_add(abuf, s[i]);
     }
 }
 
-void active_buf_add(struct active_buf* abuf, CHAR c)
+void active_buf_add(active_buf* abuf, CHAR c)
 {
     abuf->top++;
     if (abuf->top >= abuf->max) {
@@ -46,7 +46,7 @@ void active_buf_add(struct active_buf* abuf, CHAR c)
     abuf->buf[abuf->top] = c;
 }
 
-CHAR active_buf_top(struct active_buf* abuf)
+CHAR active_buf_top(active_buf* abuf)
 {
     int top = abuf->top;
     if (top >= 0)
@@ -55,7 +55,7 @@ CHAR active_buf_top(struct active_buf* abuf)
         return 0;
 }
 
-int active_buf_at(struct active_buf* abuf, CHAR c)
+int active_buf_at(active_buf* abuf, CHAR c)
 {
     int top = abuf->top;
     if (top >= 0)
@@ -64,7 +64,7 @@ int active_buf_at(struct active_buf* abuf, CHAR c)
         return 0;
 }
 
-int active_buf_at1(struct active_buf* abuf, CHAR c)
+int active_buf_at1(active_buf* abuf, CHAR c)
 {
     int top = abuf->top;
     if (top >= 1)
@@ -73,7 +73,7 @@ int active_buf_at1(struct active_buf* abuf, CHAR c)
         return 0;
 }
 
-void active_buf_pop(struct active_buf* abuf, int n)
+void active_buf_pop(active_buf* abuf, int n)
 {
     int top = abuf->top;
     if (top < 0)
@@ -82,7 +82,7 @@ void active_buf_pop(struct active_buf* abuf, int n)
     abuf->top -= n;
 }
 
-void active_buf_print(FILE* f, struct active_buf* abuf)
+void active_buf_print(FILE* f, active_buf* abuf)
 {
     for (int i = abuf->top; i >= 0; i--) {
         if (abuf->buf[i] == '\n')

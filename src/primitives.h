@@ -3,15 +3,15 @@
 
 #include "trac.h"
 
-typedef int (*primitive_function)(struct TRAC* trac, struct ARGS* args);
+typedef int (*primitive_function)(TRAC* trac, ARGS* args);
 
-struct primitive {
+typedef struct {
     CHAR* name;
     primitive_function fun;
-};
+} primitive;
 
 void primitives_init();
 
-struct primitive* lookup_primitive(CHAR* name);
+primitive* lookup_primitive(CHAR* name);
 
 #endif

@@ -3,18 +3,18 @@
 
 #include "common.h"
 
-struct string_buf {
+typedef struct {
     CHAR* buf;
     int len;
     int max;
-};
+} string_buf;
 
-struct string_buf* string_buf_new(int max);
+string_buf* string_buf_new(int max);
 
-void string_buf_free(struct string_buf* sbuf);
+void string_buf_free(string_buf* sbuf);
 
-void string_buf_add(struct string_buf* sbuf, CHAR c);
+void string_buf_add(string_buf* sbuf, CHAR c);
 
-void string_buf_append(struct string_buf* sbuf, CHAR* c);
+void string_buf_append(string_buf* sbuf, CHAR* c);
 
 #endif

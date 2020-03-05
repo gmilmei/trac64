@@ -14,11 +14,11 @@
 
 #define DEFAULT_MAX_BUF_SIZE 1024
 
-static CHAR* idle_script = (CHAR*)"#(ps,#(rs)(\n))";
+static CHAR* idle_script = C("#(ps,#(rs)(\n))");
 
 static int debug = 0;
 
-static void print_buffers(struct TRAC* trac)
+static void print_buffers(TRAC* trac)
 {
     if (debug) {
         neutral_buf_print(stderr, trac->nbuf);
@@ -28,7 +28,7 @@ static void print_buffers(struct TRAC* trac)
     }
 }
 
-static void trac_init(struct TRAC* trac)
+static void trac_init(TRAC* trac)
 {
     trac->abuf = active_buf_new(DEFAULT_MAX_BUF_SIZE);
     trac->nbuf = neutral_buf_new(DEFAULT_MAX_BUF_SIZE);
@@ -40,7 +40,7 @@ static void trac_init(struct TRAC* trac)
     trac->fd_out = STDOUT_FILENO;
 }
 
-static void args_init(struct ARGS* args)
+static void args_init(ARGS* args)
 {
     args->buf = string_buf_new(DEFAULT_MAX_BUF_SIZE);
     args->n = 0;
@@ -48,13 +48,13 @@ static void args_init(struct ARGS* args)
 
 int run()
 {
-    struct TRAC trac;
-    struct ARGS args;
+    TRAC trac;
+    ARGS args;
     trac_init(&trac);
     args_init(&args);
 
-    struct active_buf* abuf = trac.abuf;
-    struct neutral_buf* nbuf = trac.nbuf;
+    active_buf* abuf = trac.abuf;
+    neutral_buf* nbuf = trac.nbuf;
 
     for (;;) {
         active_buf_clear(abuf);
@@ -108,7 +108,7 @@ int run()
                             args.n++;
                         }
                         else {
-                            CHAR c = echar_to_char(nbuf->buf[i]);
+                            CHAR c = ec_to_c(nbuf->buf[i]);
                             string_buf_add(args.buf, c);
                         }
                     }
@@ -124,10 +124,8 @@ int run()
 
                     nbuf->top = prim_pos-1;
                     nbuf->last_prim = echar_get_number(nbuf->buf[prim_pos]);
-                    struct primitive* prim = lookup_primitive(args.buf->buf);
-                    if (prim) {
-                        prim->fun(&trac, &args);
-                    }
+                    primitive* prim = lookup_primitive(args.buf->buf);
+                    if (prim) prim->fun(&trac, &args);
                 }
                 else {
                     // TODO: unbalanced parentheses

@@ -5,7 +5,7 @@
 #include <termios.h>
 #include "io.h"
 
-struct string_buf* ibuf;
+string_buf* ibuf;
 
 void io_init()
 {
@@ -59,7 +59,7 @@ static void put_char(int fd, int c)
     write(fd, buf, 1);
 }
 
-static int back_char(int fd, struct string_buf* sbuf)
+static int back_char(int fd, string_buf* sbuf)
 {
     if (sbuf->len > 0 && sbuf->buf[sbuf->len-1] != '\n') {
         put_char(fd, 0x08);
@@ -76,7 +76,7 @@ static int back_char(int fd, struct string_buf* sbuf)
 
 int io_in(int fd_in, int fd_out,
           CHAR meta_char, CHAR dump_char, CHAR delete_char,
-          struct string_buf* sbuf)
+          string_buf* sbuf)
 {
     struct termios saved_term;
     raw(fd_in, &saved_term);
@@ -97,7 +97,7 @@ int io_in(int fd_in, int fd_out,
         }
         else {
             put_char(fd_out, c);
-            string_buf_add(sbuf, (CHAR)c);
+            string_buf_add(sbuf, c);
         }
     }
     cooked(fd_in, &saved_term);

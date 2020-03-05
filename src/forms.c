@@ -3,40 +3,40 @@
 #include "forms.h"
 #include "string_buf.h"
 
-struct form* form_new(const CHAR* name, const CHAR* s, int len)
+form* form_new(const CHAR* name, const CHAR* s, int len)
 {
-    struct form* form = calloc(1, sizeof(struct form));
-    form->name = (CHAR*)strdup((char*)name);
-    form->buf = malloc(len*sizeof(ECHAR));
-    ECHAR* buf = form->buf;
+    form* f = calloc(1, sizeof(form));
+    f->name = C(strdup(c(name)));
+    f->buf = malloc(len*sizeof(ECHAR));
+    ECHAR* buf = f->buf;
     for (int i = 0; i < len; i++) {
         buf[i] = s[i];
     }
-    form->len = len;
-    return form;
+    f->len = len;
+    return f;
 }
 
-void form_free(struct form* form)
+void form_free(form* f)
 {
-    free(form->buf);
-    free(form->name);
-    free(form);
+    free(f->buf);
+    free(f->name);
+    free(f);
 }
 
 /*
  * The string returned must be freed.
  */
-CHAR* form_get(struct form* form, CHAR** fargs, int fnargs)
+CHAR* form_get(form* f, CHAR** fargs, int fnargs)
 {
-    struct string_buf* sbuf = string_buf_new(form->len*2);
-    for (int i = 0; i < form->len; i++) {
-        ECHAR ec = form->buf[i];
+    string_buf* sbuf = string_buf_new(f->len*2);
+    for (int i = 0; i < f->len; i++) {
+        ECHAR ec = f->buf[i];
         if (echar_is_gap(ec)) {
             int n = echar_get_number(ec);
             if (n < fnargs) string_buf_append(sbuf, fargs[n]);
         }
         else {
-            string_buf_add(sbuf, echar_to_char(ec));
+            string_buf_add(sbuf, ec_to_c(ec));
         }
     }
     string_buf_add(sbuf, 0);
@@ -46,20 +46,20 @@ CHAR* form_get(struct form* form, CHAR** fargs, int fnargs)
     return s;
 }
 
-void form_ss(struct form* form, CHAR** fargs, int fnargs)
+void form_ss(form* f, CHAR** fargs, int fnargs)
 {
-    ECHAR* new_buf = malloc(form->len*sizeof(ECHAR));
+    ECHAR* new_buf = malloc(f->len*sizeof(ECHAR));
     int j = 0;
-    int len = form->len;
+    int len = f->len;
     for (int i = 0; i < len; i++) {
-        ECHAR ec = form->buf[i];
+        ECHAR ec = f->buf[i];
         int k;
         for (k = 0; k < fnargs; k++) {
             CHAR* arg = fargs[k];
             int l = 0;
             while (arg[l] && i+l < len) {
-                if (echar_is_gap(form->buf[i+l])) goto K;
-                if (arg[l] != echar_to_char(form->buf[i+l])) goto K;
+                if (echar_is_gap(f->buf[i+l])) goto K;
+                if (arg[l] != ec_to_c(f->buf[i+l])) goto K;
                 l++;
             }
             if (i+l < len) {
@@ -72,107 +72,107 @@ void form_ss(struct form* form, CHAR** fargs, int fnargs)
         /* no pattern found */
         if (k == fnargs) new_buf[j++] = ec;
     }
-    free(form->buf);
-    form->buf = new_buf;
+    free(f->buf);
+    f->buf = new_buf;
 }
 
-void form_print(FILE* f, struct form* form)
+void form_print(FILE* file, form* f)
 {
-    fprintf(f, "%s:", form->name);
-    for (int i = 0; i < form->len; i++) {
-        ECHAR ec = form->buf[i];
+    fprintf(file, "%s:", f->name);
+    for (int i = 0; i < f->len; i++) {
+        ECHAR ec = f->buf[i];
         if (echar_is_gap(ec))
-            fprintf(f, "[%d]", echar_get_number(ec));
+            fprintf(file, "[%d]", echar_get_number(ec));
         else
-            fprintf(f, "%c", echar_to_char(ec));
+            fprintf(file, "%c", ec_to_c(ec));
     }
 }
 
-struct forms* forms_new(int max)
+forms* forms_new(int max)
 {
-    struct forms* forms = malloc(sizeof(struct forms));
-    forms->table = calloc(max, sizeof(struct form*));
-    forms->max = max;
-    forms->size = 0;
-    return forms;
+    forms* fs = malloc(sizeof(forms));
+    fs->table = calloc(max, sizeof(form*));
+    fs->max = max;
+    fs->size = 0;
+    return fs;
 }
 
-void forms_free(struct forms* forms)
+void forms_free(forms* fs)
 {
     // TODO
 }
 
 static int form_compare(const void* a, const void* b)
 {
-    const struct form* const *af = a;
-    const struct form* const *bf = b;
+    const form* const *af = a;
+    const form* const *bf = b;
     if (*af && !*bf) return -1;
     if (!*af && *bf) return 1;
     if (!*af && !*bf) return 0;
-    return strcmp((char*)(*af)->name, (char*)(*bf)->name);
+    return strcmp(c((*af)->name), c((*bf)->name));
 }
 
 static int name_compare(const void* name, const void* b)
 {
-    const struct form* const *bf = b;
-    return strcmp((char*)name, (char*)(*bf)->name);
+    const form* const *bf = b;
+    return strcmp(c(name), c((*bf)->name));
 }
 
-static void forms_sort(struct forms* forms)
+static void forms_sort(forms* fs)
 {
-    qsort(forms->table, forms->size, sizeof(struct form*), form_compare);
+    qsort(fs->table, fs->size, sizeof(form*), form_compare);
 }
 
-static void ensure_size(struct forms* forms, int size)
+static void ensure_size(forms* fs, int size)
 {
-    if (size > forms->size) {
-        int s = forms->size;
-        forms->max *= 2;
-        forms->table = realloc(forms->table, forms->max*sizeof(struct form*));
-        for (int i = s; i < forms->max; i++) {
-            forms->table[i] = 0;
+    if (size > fs->size) {
+        int s = fs->size;
+        fs->max *= 2;
+        fs->table = realloc(fs->table, fs->max*sizeof(form*));
+        for (int i = s; i < fs->max; i++) {
+            fs->table[i] = 0;
         }
     }
 }
 
-struct form* form_lookup(struct forms* forms, const CHAR* name)
+form* form_lookup(forms* fs, const CHAR* name)
 {
-    struct form** form;
-    form = bsearch(name, forms->table, forms->size,
-                   sizeof(struct form*), name_compare);
-    if (form)
-        return *form;
+    form** f;
+    f = bsearch(name, fs->table, fs->size,
+                sizeof(form*), name_compare);
+    if (f)
+        return *f;
     else
         return 0;
 }
 
-void form_delete(struct forms* forms, const CHAR* name)
+void form_delete(forms* fs, const CHAR* name)
 {
-    struct form** form;
-    form = bsearch(name, forms->table, forms->size,
-                   sizeof(struct form*), name_compare);
-    if (form) {
-        form_free(*form);
-        *form = 0;
-        forms_sort(forms);
-        forms->size--;
+    form** f;
+    f = bsearch(name, fs->table, fs->size,
+                sizeof(form*), name_compare);
+    if (f) {
+        form_free(*f);
+        *f = 0;
+        forms_sort(fs);
+        fs->size--;
     }
 }
 
-void form_define(struct forms* forms, const CHAR* name, const CHAR* s, int len)
+void form_define(forms* fs, const CHAR* name, const CHAR* s, int len)
 {
-    form_delete(forms, name);
-    ensure_size(forms, forms->size+1);
-    struct form* form = form_new(name, s, len);
-    forms->table[forms->size] = form;
-    forms->size++;
-    forms_sort(forms);
+    form_delete(fs, name);
+    ensure_size(fs, fs->size+1);
+    form* f = form_new(name, s, len);
+    fs->table[fs->size] = f;
+    fs->size++;
+    forms_sort(fs);
 }
 
-void forms_print(FILE* f, struct forms* forms)
+void forms_print(FILE* file, forms* fs)
 {
-    for (int i = 0; i < forms->size; i++) {
-        form_print(f, forms->table[i]);
-        fprintf(f, "\n");
+    for (int i = 0; i < fs->size; i++) {
+        form_print(file, fs->table[i]);
+        fprintf(file, "\n");
     }
 }

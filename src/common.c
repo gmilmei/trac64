@@ -1,7 +1,7 @@
 #include <ctype.h>
 #include "common.h"
 
-CHAR echar_to_char(ECHAR echar)
+CHAR ec_to_c(ECHAR echar)
 {
     return echar&0xFF;
 }
