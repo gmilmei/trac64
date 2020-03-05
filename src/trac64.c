@@ -39,12 +39,32 @@ static void trac_init(TRAC* trac)
     trac->dump_char = 0x17;
     trac->fd_in = STDIN_FILENO;
     trac->fd_out = STDOUT_FILENO;
+    trac->trace = 0;
 }
 
 static void args_init(ARGS* args)
 {
     args->buf = string_buf_new(DEFAULT_MAX_BUF_SIZE);
     args->n = 0;
+}
+
+static void trace(TRAC* trac, ARGS* args)
+{
+    ansi_fg(trac->fd_out, ANSI_RED);
+    if (args->to == TO_NEUTRAL)
+        fprintf(stdout, "##/");
+    else
+        fprintf(stdout, "#/");    
+    for (int i = 0; i < args->n; i++) {
+        if (i > 0) fprintf(stdout, "*");
+        fprintf(stdout, "%s", &args->buf->buf[args->pos[i]]);
+    }
+    fflush(stdout);
+    CHAR c = io_char(trac->fd_in);
+    if (c != '\n') trac->trace = 0;
+    fprintf(stdout, "\n");
+    fflush(stdout);
+    ansi_reset(trac->fd_out);
 }
 
 int run(CHAR* script)
@@ -119,13 +139,7 @@ int run(CHAR* script)
                     }
                     string_buf_add(args.buf, 0);
 
-#if 0
-                    fprintf(stderr, "to:%d\n", args.to);
-                    fprintf(stderr, "nargs:%d\n", args.n);
-                    for (int i = 0; i < args.n; i++) {
-                        fprintf(stderr, "%d: |%s|\n", i, &args.buf->buf[args.pos[i]]);
-                    }
-#endif
+                    if (trac.trace) trace(&trac, &args);
 
                     nbuf->top = prim_pos-1;
                     nbuf->last_prim = echar_get_number(nbuf->buf[prim_pos]);

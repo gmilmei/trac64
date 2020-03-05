@@ -405,13 +405,13 @@ static int prim_pf(TRAC* trac, ARGS* args)
 
 static int prim_tn(TRAC* trac, ARGS* args)
 {
-    // TODO
+    trac->trace = 1;
     return 0;
 }
 
 static int prim_tf(TRAC* trac, ARGS* args)
 {
-    // TODO
+    trac->trace = 0;
     return 0;
 }
 

@@ -17,6 +17,8 @@ typedef struct {
 
     int fd_in;
     int fd_out;
+
+    int trace;
 } TRAC;
 
 #define TO_ACTIVE 0
