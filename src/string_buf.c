@@ -42,3 +42,32 @@ void string_buf_append(string_buf* sbuf, CHAR* s)
     }
     sbuf->buf[sbuf->len] = 0;
 }
+
+void string_buf_append_number(string_buf* sbuf, long n)
+{
+    int p = sbuf->len;
+
+    if (n < 0) {
+        string_buf_add(sbuf, '-');
+        n = -n;
+        p++;
+    }
+
+    if (n == 0) {
+        string_buf_add(sbuf, '0');
+        return;
+    }
+
+    while (n != 0) {
+        string_buf_add(sbuf, (n % 10)+'0');
+        n /= 10;
+    }
+
+    int len = sbuf->len-p;
+
+    for (int i = 0; i < len/2; i++) {
+        CHAR c = sbuf->buf[i];
+        sbuf->buf[i] = sbuf->buf[len-i-1];
+        sbuf->buf[len-i-1] = c;
+    }
+}

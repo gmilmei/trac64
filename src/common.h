@@ -32,4 +32,6 @@ ECHAR echar_set_arg(ECHAR echar);
 
 #define C(s) ((CHAR*)s)
 
+long parse_number(CHAR* s, int* sign);
+
 #endif

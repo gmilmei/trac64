@@ -51,6 +51,70 @@ static CHAR** make_fargs(ARGS* args, int* fnargs, int start)
     return fargs;
 }
 
+static void prim_arith_get_args(TRAC* trac, ARGS* args, long* n1, long *n2) {
+    CHAR* a1 = get_arg(args, 1);
+    CHAR* a2 = get_arg(args, 2);
+    int s1 = 0;
+    *n1 = parse_number(a1, &s1);
+    if (s1 < 0) *n1 *= -1;
+    int s2 = 0;
+    *n2 = parse_number(a2, &s2);
+    if (s2 < 0) *n2 *= -1;
+}
+
+static int prim_ad(TRAC* trac, ARGS* args)
+{
+    long n1, n2;
+    prim_arith_get_args(trac, args, &n1, &n2);
+    long n = n1+n2;
+    string_buf* sbuf = string_buf_new(128);
+    string_buf_append_number(sbuf, n);
+    value(args->to, trac, sbuf->buf, sbuf->len);
+    string_buf_free(sbuf);
+    return 0;
+}
+
+static int prim_su(TRAC* trac, ARGS* args)
+{
+    long n1, n2;
+    prim_arith_get_args(trac, args, &n1, &n2);
+    long n = n1-n2;
+    string_buf* sbuf = string_buf_new(128);
+    string_buf_append_number(sbuf, n);
+    value(args->to, trac, sbuf->buf, sbuf->len);
+    string_buf_free(sbuf);
+    return 0;
+}
+
+static int prim_ml(TRAC* trac, ARGS* args)
+{
+    long n1, n2;
+    prim_arith_get_args(trac, args, &n1, &n2);
+    long n = n1*n2;
+    string_buf* sbuf = string_buf_new(128);
+    string_buf_append_number(sbuf, n);
+    value(args->to, trac, sbuf->buf, sbuf->len);
+    string_buf_free(sbuf);
+    return 0;
+}
+
+static int prim_dv(TRAC* trac, ARGS* args)
+{
+    long n1, n2;
+    prim_arith_get_args(trac, args, &n1, &n2);
+    if (n2 == 0) {
+        CHAR* ex = get_arg(args, 3);
+        value(args->to, trac, ex, strlen(c(ex)));
+        return 0;
+    }
+    long n = n1/n2;
+    string_buf* sbuf = string_buf_new(128);
+    string_buf_append_number(sbuf, n);
+    value(args->to, trac, sbuf->buf, sbuf->len);
+    string_buf_free(sbuf);
+    return 0;
+}
+
 static int prim_cl(TRAC* trac, ARGS* args)
 {
     CHAR* name = get_arg(args, 1);
@@ -162,12 +226,16 @@ primitive* lookup_primitive(CHAR* name)
 void primitives_init()
 {
     prims = calloc(MAX_PRIM, sizeof(primitive));
+    reg_prim("AD", prim_ad);
     reg_prim("CL", prim_cl);
     reg_prim("DS", prim_ds);
+    reg_prim("DV", prim_dv);
     reg_prim("HL", prim_hl);
+    reg_prim("ML", prim_ml);
     reg_prim("PS", prim_ps);
     reg_prim("RS", prim_rs);
     reg_prim("SS", prim_ss);
+    reg_prim("SU", prim_su);
     default_prim.name = C("");
     default_prim.fun = prim_default;
 }

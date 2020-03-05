@@ -1,3 +1,4 @@
+#include <string.h>
 #include "common.h"
 
 CHAR ec_to_c(ECHAR echar)
@@ -53,4 +54,31 @@ int echar_is_arg(ECHAR echar)
 ECHAR echar_set_arg(ECHAR echar)
 {
     return echar|0x8000;
+}
+
+long parse_number(CHAR* s, int* sign)
+{
+    long n = 0;
+    int len = strlen(c(s));
+    *sign = 0;
+    if (len == 0) {
+        return n;
+    }
+    int p = len-1;
+    while (p >= 0 && s[p] >= '0' && s[p] <= '9') {
+        p--;
+    }
+    if (p >= 0 && (s[p] == '+' || s[p] == '-')) {
+        *sign = s[p] == '+'?1:-1;
+        p--;
+    }
+
+    for (int i = p+1; i < len; i++) {
+        if (s[i] >= '0' && s[i] <= '9')
+            n = n*10+(s[i]-'0');
+    }
+
+    s[p+1] = 0;
+
+    return n;
 }
