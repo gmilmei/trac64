@@ -53,7 +53,7 @@ static CHAR** make_fargs(ARGS* args, int* fnargs, int start)
 
 static int prim_cl(TRAC* trac, ARGS* args)
 {
-    CHAR* name = toupper_string(get_arg(args, 1));
+    CHAR* name = get_arg(args, 1);
     form* f = form_lookup(trac->forms, name);
     if (f) {
         int fnargs = 0;
@@ -68,7 +68,7 @@ static int prim_cl(TRAC* trac, ARGS* args)
 
 static int prim_ds(TRAC* trac, ARGS* args)
 {
-    CHAR* name = toupper_string(get_arg(args, 1));
+    CHAR* name = get_arg(args, 1);
     CHAR* s = get_arg(args, 2);
     form_define(trac->forms, name, s, strlen(c(s)));
     return 0;
@@ -103,7 +103,7 @@ static int prim_rs(TRAC* trac, ARGS* args)
 
 static int prim_ss(TRAC* trac, ARGS* args)
 {
-    CHAR* name = toupper_string(get_arg(args, 1));
+    CHAR* name = get_arg(args, 1);
     form* f = form_lookup(trac->forms, name);
     if (f) {
         int fnargs = 0;
@@ -116,7 +116,7 @@ static int prim_ss(TRAC* trac, ARGS* args)
 
 static int prim_default(TRAC* trac, ARGS* args)
 {
-    CHAR* name = toupper_string(get_arg(args, 0));
+    CHAR* name = get_arg(args, 0);
     form* f = form_lookup(trac->forms, name);
     if (f) {
         int fnargs = 0;
@@ -143,11 +143,19 @@ static int prim_compare(const void* name, const void* p)
 
 primitive* lookup_primitive(CHAR* name)
 {
-    name = toupper_string(name);
     primitive* p;
-    p = bsearch(name, prims, prim_count,
-                sizeof(primitive), prim_compare);
-    if (!p) p = &default_prim;
+    if (strlen(c(name)) == 2) {
+        char n[3];
+        n[0] = (char)toupper(name[0]);
+        n[1] = (char)toupper(name[1]);
+        n[2] = 0;
+        p = bsearch(n, prims, prim_count,
+                    sizeof(primitive), prim_compare);
+        if (!p) p = &default_prim;
+    }
+    else {
+        p = &default_prim;
+    }
     return p;
 }
 

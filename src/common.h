@@ -28,8 +28,6 @@ int echar_is_arg(ECHAR echar);
 
 ECHAR echar_set_arg(ECHAR echar);
 
-CHAR* toupper_string(CHAR* p);
-
 #define c(s) ((char*)s)
 
 #define C(s) ((CHAR*)s)

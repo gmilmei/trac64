@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include "common.h"
 
 CHAR ec_to_c(ECHAR echar)
@@ -54,14 +53,4 @@ int echar_is_arg(ECHAR echar)
 ECHAR echar_set_arg(ECHAR echar)
 {
     return echar|0x8000;
-}
-
-CHAR* toupper_string(CHAR* p)
-{
-    CHAR* s = p;
-    while (*s) {
-        *s = toupper(*s);
-        s++;
-    }
-    return p;
 }
