@@ -1,1 +1,68 @@
 HELP FOR TRAC T-64
+
+Input and output control primitives
+
+* PS,t1             print string
+* RS                read string
+* CM,t1             change meta
+* RC                read character
+
+String storage and deletion primitives
+
+* DS,n1,t1          define string
+* DD,n1,n2,...      delete definition
+* DA                delete all
+
+Primitives for the creation of text macros
+
+* SS,n1,t1,t2,...   segment string
+
+Call
+
+* CL,n1,t1,t2,... call
+
+Partial call primitives
+
+* CR,n1             call restore
+* CC,n1,z           call character
+* CS,n1,z           call segment
+* CN,n1,d1,z        call N
+* IN,n1,t1,z        initial
+
+Arithmetic primitives
+
+* AD,d1,d2,z        add
+* SU,d1,d2,z        subtract
+* ML,d1,d2,z        multiply
+* DV,d1,d2,z        divide
+
+Boolean primitives
+
+* BU,b1,b2          Boolean union
+* BI,b1,b2          Boolean intersection
+* BC,b1             Boolean complement
+* BR,d1,b1          Boolean rotate
+* BS,d1,b1          Boolean shift
+
+Decision primitives
+
+* EQ,t1,t2,t3,t4    string equality
+* GR,d1,d2,t1,t2    greater than
+
+Auxiliary storage primitives
+
+* SB,n1,n2,...      store block
+* FB,n1             fetch block
+* EB,n1             erase block
+
+Diagnostic
+
+* LN,t1             list names
+* PF,n1             print form
+* TN                trace on
+* TF                trace off
+
+Housekeeping
+
+* HL                halt
+* MO,t1             mode
