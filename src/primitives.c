@@ -362,7 +362,16 @@ static int prim_eb(TRAC* trac, ARGS* args)
 
 static int prim_ln(TRAC* trac, ARGS* args)
 {
-    // TODO
+    CHAR* p = get_arg(args, 1);
+    form** fs = trac->forms->table;
+    int size = trac->forms->size;
+    string_buf* sbuf = string_buf_new(256);
+    for (int i = 0; i < size; i++) {
+        form* f = fs[i];
+        string_buf_append(sbuf, p);
+        string_buf_append(sbuf, f->name);
+    }
+    value(args->to, trac, sbuf->buf, sbuf->len);
     return 0;
 }
 
