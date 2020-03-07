@@ -9,6 +9,7 @@ OBJS=\
 	neutral_buf.o \
 	active_buf.o \
 	primitives.o \
+	boolean.o \
 	io.o \
 	trac64.o \
 	ansi.o

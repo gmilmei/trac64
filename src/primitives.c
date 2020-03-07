@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "ansi.h"
+#include "boolean.h"
 #include "io.h"
 #include "primitives.h"
 #include "help.h"
@@ -59,7 +60,7 @@ static CHAR** make_fargs(ARGS* args, int* fnargs, int start)
 static int prim_ps(TRAC* trac, ARGS* args)
 {
     if (args->n > 1) {
-        CHAR* s = &args->buf->buf[args->pos[1]];
+        CHAR* s = get_arg(args, 1);
         int len = strlen(c(s));
         ansi_fg(trac->fd_out, OUTPUT_COLOR);
         io_out(trac->fd_out, s, len);
@@ -288,33 +289,77 @@ static int prim_dv(TRAC* trac, ARGS* args)
  * Boolean primitives (BU, BI, BC, BR, BS).
  */
 
+static long prim_get_number(CHAR* a)
+{
+    long n;
+    int s = 0;
+    n = parse_number(a, &s);
+    if (s < 0) n = -n;
+    return n;
+}
+
 static int prim_bu(TRAC* trac, ARGS* args)
 {
-    // TODO
+    string_buf* b1 = string_buf_new(32);
+    string_buf* b2 = string_buf_new(32);
+    parse_boolean(get_arg(args, 1), b1);
+    parse_boolean(get_arg(args, 2), b2);
+    boolean_union(b1, b2);
+    unparse_boolean(b2);
+    value(args->to, trac, b2->buf, b2->len);
+    string_buf_free(b1);
+    string_buf_free(b2);
     return 0;
 }
 
 static int prim_bi(TRAC* trac, ARGS* args)
 {
-    // TODO
+    string_buf* b1 = string_buf_new(32);
+    string_buf* b2 = string_buf_new(32);
+    parse_boolean(get_arg(args, 1), b1);
+    parse_boolean(get_arg(args, 2), b2);
+    boolean_intersection(b1, b2);
+    unparse_boolean(b2);
+    value(args->to, trac, b2->buf, b2->len);
+    string_buf_free(b1);
+    string_buf_free(b2);
     return 0;
 }
 
 static int prim_bc(TRAC* trac, ARGS* args)
 {
-    // TODO
+    string_buf* b = string_buf_new(32);
+    parse_boolean(get_arg(args, 1), b);
+    boolean_complement(b);
+    unparse_boolean(b);
+    value(args->to, trac, b->buf, b->len);
+    string_buf_free(b);
     return 0;
 }
 
 static int prim_br(TRAC* trac, ARGS* args)
 {
-    // TODO
+    long n = prim_get_number(get_arg(args, 1));
+    string_buf* b = string_buf_new(32);
+    if (parse_boolean(get_arg(args, 2), b))
+        return 0;
+    boolean_shift(b, n, 1);
+    unparse_boolean(b);
+    value(args->to, trac, b->buf, b->len);
+    string_buf_free(b);
     return 0;
 }
 
 static int prim_bs(TRAC* trac, ARGS* args)
 {
-    // TODO
+    long n = prim_get_number(get_arg(args, 1));
+    string_buf* b = string_buf_new(32);
+    if (parse_boolean(get_arg(args, 2), b))
+        return 0;
+    boolean_shift(b, n, 0);
+    unparse_boolean(b);
+    value(args->to, trac, b->buf, b->len);
+    string_buf_free(b);
     return 0;
 }
 
@@ -428,6 +473,7 @@ static int prim_mo(TRAC* trac, ARGS* args)
 {
     if (args->n == 1) {
         primitives_init(0);
+        boolean_set_digit_base(8);
         fprintf(stdout, "<T64>");
         fflush(stdout);
     }
@@ -446,6 +492,15 @@ static int prim_mo(TRAC* trac, ARGS* args)
         }
         else if (strcmp(c(s), "NOCOLOR") == 0) {
             set_ansi(0);
+        }
+        else if (strcmp(c(s), "HEX") == 0) {
+            boolean_set_digit_base(16);
+        }
+        else if (strcmp(c(s), "BIN") == 0) {
+            boolean_set_digit_base(2);
+        }
+        else if (strcmp(c(s), "OCT") == 0) {
+            boolean_set_digit_base(8);
         }
     }
 
