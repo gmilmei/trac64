@@ -15,7 +15,7 @@
 
 #define DEFAULT_MAX_BUF_SIZE 1024
 
-static CHAR* idle_script = C("#(ps,#(rs)(\n))");
+static CHAR* idling_script = C("#(ps,#(rs)(\n))");
 
 static int debug = 0;
 
@@ -71,7 +71,7 @@ static void trace(TRAC* trac, ARGS* args)
 int run(CHAR* script)
 {
 
-    if (!script) script = idle_script;
+    if (!script) script = idling_script;
     
     TRAC trac;
     ARGS args;
@@ -84,7 +84,7 @@ int run(CHAR* script)
     for (;;) {
         active_buf_clear(abuf);
         active_buf_prepend(abuf, script, -1);
-        script = idle_script;
+        script = idling_script;
         while (abuf->top >= 0) {
             print_buffers(&trac);
             CHAR c = abuf->buf[abuf->top];
@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
     int quiet = 0;
     char* script_file = 0;
     CHAR* script = 0;
-    char* alt_idle_script_file = 0;
+    char* alt_idling_script_file = 0;
     
     while ((opt = getopt(argc, argv, "qcei:")) != -1) {
         switch (opt) {
@@ -232,7 +232,7 @@ int main(int argc, char* argv[])
             quiet = 1;
             break;
         case 'i':
-            alt_idle_script_file = strdup(optarg);
+            alt_idling_script_file = strdup(optarg);
             break;
         default:
             break;
@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    if (alt_idle_script_file) {
+    if (alt_idling_script_file) {
         // TODO
     }
     
