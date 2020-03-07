@@ -7,10 +7,12 @@ form* form_new(const CHAR* name, const CHAR* s, int len)
 {
     form* f = calloc(1, sizeof(form));
     f->name = C(strdup(c(name)));
-    f->buf = malloc(len*sizeof(ECHAR));
-    ECHAR* buf = f->buf;
-    for (int i = 0; i < len; i++) {
-        buf[i] = s[i];
+    if (s) {
+        f->buf = malloc(len*sizeof(ECHAR));
+        ECHAR* buf = f->buf;
+        for (int i = 0; i < len; i++) {
+            buf[i] = s[i];
+        }
     }
     f->len = len;
     return f;
@@ -192,12 +194,17 @@ void form_delete(forms* fs, const CHAR* name)
     }
 }
 
-void form_define(forms* fs, const CHAR* name, const CHAR* s, int len)
+void form_set(forms* fs, form* f)
 {
-    form_delete(fs, name);
+    form_delete(fs, f->name);
     ensure_size(fs, fs->size+1);
-    form* f = form_new(name, s, len);
     fs->table[fs->size] = f;
     fs->size++;
     forms_sort(fs);
+}
+
+
+void form_define(forms* fs, const CHAR* name, const CHAR* s, int len)
+{
+    form_set(fs, form_new(name, s, len));
 }

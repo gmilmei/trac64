@@ -35,6 +35,10 @@ void form_delete(forms* fs, const CHAR* name);
 
 form* form_lookup(forms* fs, const CHAR* name);
 
+form* form_new(const CHAR* name, const CHAR* s, int len);
+
+void form_set(forms* fs, form* f);
+
 void form_define(forms* fs, const CHAR* name, const CHAR* s, int len);
 
 void form_print(FILE* file, form* f);

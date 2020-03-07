@@ -3,16 +3,17 @@ CFLAGS=-Wall -std=c99 -D_POSIX_C_SOURCE=200809L -pedantic -g ${OPTFLAGS}
 CC=gcc
 
 OBJS=\
+	active_buf.o \
+	ansi.o \
+	blocks.o \
+	boolean.o \
 	common.o \
 	forms.o \
-	string_buf.o \
-	neutral_buf.o \
-	active_buf.o \
-	primitives.o \
-	boolean.o \
 	io.o \
-	trac64.o \
-	ansi.o
+	neutral_buf.o \
+	primitives.o \
+	string_buf.o \
+	trac64.o
 
 all: trac64
 

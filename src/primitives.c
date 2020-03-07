@@ -4,14 +4,13 @@
 #include <string.h>
 #include <unistd.h>
 #include "ansi.h"
+#include "blocks.h"
 #include "boolean.h"
+#include "help.h"
 #include "io.h"
 #include "primitives.h"
-#include "help.h"
 
 #define MAX_PRIM 100
-
-#define OUTPUT_COLOR "26"
 
 static primitive* prims;
 static int prim_count = 0;
@@ -392,15 +391,49 @@ static int prim_gr(TRAC* trac, ARGS* args)
  * Auxiliary storage primitives (SB, FB, EB).
  */
 
+static void block_create_filename(TRAC* trac, CHAR* bname, string_buf* fname)
+{
+    form* form = form_lookup(trac->forms, bname);    
+    if (!form) {
+        gen_filename_from_blockname(bname, fname);
+        form_define(trac->forms, bname, fname->buf, fname->len);
+    }
+    else {
+        CHAR* s = form_get(form, 0, 0);
+        string_buf_append(fname, s);
+        free(s);
+    }
+ }
+
 static int prim_sb(TRAC* trac, ARGS* args)
 {
-    // TODO
+    if (args->n < 1) return 0;
+    string_buf* filename = string_buf_new(128);
+    CHAR* blockname = get_arg(args, 1);
+    block_create_filename(trac, blockname, filename);
+    form** formlist = malloc(sizeof(form*)*(args->n));
+    int j = 0;
+    for (int i = 2; i < args->n; i++) {
+        form* f = form_lookup(trac->forms, get_arg(args, i));
+        if (f) formlist[j++] = f;
+    }
+    formlist[j] = 0;
+    int r = store_block(filename->buf, formlist);
+    free(formlist);
+    string_buf_free(filename);
+    if (!r) io_display(trac->fd_out, DIAGNOSTIC_COLOR, "<STE>");
     return 0;
 }
 
 static int prim_fb(TRAC* trac, ARGS* args)
 {
-    // TODO
+    if (args->n < 1) return 0;
+    string_buf* filename = string_buf_new(128);
+    CHAR* blockname = get_arg(args, 1);
+    block_create_filename(trac, blockname, filename);
+    int r = fetch_block(filename->buf, trac->forms);
+    string_buf_free(filename);
+    if (!r) io_display(trac->fd_out, DIAGNOSTIC_COLOR, "<STE>");
     return 0;
 }
 
