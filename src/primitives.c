@@ -407,7 +407,7 @@ static void block_create_filename(TRAC* trac, CHAR* bname, string_buf* fname)
 
 static int prim_sb(TRAC* trac, ARGS* args)
 {
-    if (args->n < 1) return 0;
+    if (args->n < 2) return 0;
     string_buf* filename = string_buf_new(128);
     CHAR* blockname = get_arg(args, 1);
     block_create_filename(trac, blockname, filename);
@@ -419,9 +419,18 @@ static int prim_sb(TRAC* trac, ARGS* args)
     }
     formlist[j] = 0;
     int r = store_block(filename->buf, formlist);
-    free(formlist);
     string_buf_free(filename);
-    if (!r) io_display(trac->fd_out, DIAGNOSTIC_COLOR, "<STE>");
+    if (r) {
+    for (form** fl = formlist; *fl; fl++) {
+        if (strcmp(c((*fl)->name), c(blockname)) != 0) {
+            form_delete(trac->forms, ((*fl)->name));
+        }
+    }
+    }
+    else {
+        io_display(trac->fd_out, DIAGNOSTIC_COLOR, "<STE>");
+    }
+    free(formlist);
     return 0;
 }
 
@@ -439,7 +448,18 @@ static int prim_fb(TRAC* trac, ARGS* args)
 
 static int prim_eb(TRAC* trac, ARGS* args)
 {
-    // TODO
+    CHAR* blockname = get_arg(args, 1);
+    form* f = form_lookup(trac->forms, blockname);
+    if (!f) return 0;
+    CHAR* s = form_get(f, 0, 0);
+    int r = erase_block(s);
+    free(s);
+    if (r) {
+        form_delete(trac->forms, blockname);
+    }
+    else {
+        io_display(trac->fd_out, DIAGNOSTIC_COLOR, "<STE>");
+    }
     return 0;
 }
 

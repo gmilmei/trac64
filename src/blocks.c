@@ -150,3 +150,9 @@ int fetch_block(CHAR* filename, forms* fs)
     string_buf_free(name);
     return 1;
 }
+
+int erase_block(CHAR* filename)
+{
+    int r = unlink(c(filename));
+    return r == 0?1:0;
+}

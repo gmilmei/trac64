@@ -11,4 +11,6 @@ int store_block(CHAR* filename, form* formlist[]);
 
 int fetch_block(CHAR* filename, forms* fs);
 
+int erase_block(CHAR* filename);
+
 #endif
