@@ -26,6 +26,7 @@ static void print_buffers(TRAC* trac)
         fprintf(stderr, "__");
         active_buf_print(stderr, trac->abuf);
         fprintf(stderr, "\n");
+        fflush(stderr);
     }
 }
 
@@ -253,6 +254,7 @@ int main(int argc, char* argv[])
     if (!quiet) {
         ansi_fg(STDOUT_FILENO, "92");
         printf("%s %s\n", "TRAC T-64", VERSION_STRING);
+        fflush(stdout);
         ansi_reset(STDOUT_FILENO);
     }
 

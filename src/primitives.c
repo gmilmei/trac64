@@ -369,7 +369,16 @@ static int prim_bs(TRAC* trac, ARGS* args)
 
 static int prim_eq(TRAC* trac, ARGS* args)
 {
-    // TODO
+    CHAR* t1 = get_arg(args, 1);
+    CHAR* t2 = get_arg(args, 2);
+    CHAR* t3 = get_arg(args, 3);
+    CHAR* t4 = get_arg(args, 4);
+    if (strcmp(c(t1), c(t2)) == 0) {
+        value(args->to, trac, t3, strlen(c(t3)));
+    }
+    else {
+        value(args->to, trac, t4, strlen(c(t4)));
+    }
     return 0;
 }
 
