@@ -51,7 +51,7 @@ static void args_init(ARGS* args)
 
 static void trace(TRAC* trac, ARGS* args)
 {
-    ansi_fg(trac->fd_out, ANSI_RED);
+    ansi_fg(trac->fd_out, TRACE_COLOR);
     if (args->to == TO_NEUTRAL)
         fprintf(stdout, "##/");
     else
@@ -257,10 +257,7 @@ int main(int argc, char* argv[])
     set_ansi(ansi);
 
     if (!quiet) {
-        ansi_fg(STDOUT_FILENO, "92");
-        printf("%s %s\n", "TRAC T-64", VERSION_STRING);
-        fflush(stdout);
-        ansi_reset(STDOUT_FILENO);
+        io_display(STDOUT_FILENO, VERSION_COLOR, VERSION_STRING "\n");
     }
 
     run(script);

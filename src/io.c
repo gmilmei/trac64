@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
+#include "string.h"
 #include "io.h"
+#include "ansi.h"
 
 string_buf* ibuf;
 
@@ -116,6 +118,13 @@ CHAR io_char(int fd)
     int c = get_char(fd);
     cooked(fd, &saved_term);
     return (CHAR)c;
+}
+
+void io_display(int fd, const char* color, const char* text)
+{
+    ansi_fg(fd, color);
+    write(fd, c(text), strlen(c(text)));
+    ansi_reset(fd);
 }
 
 CHAR* read_file(char* filename)

@@ -12,7 +12,7 @@
 
 void set_ansi(int enabled);
 
-void ansi_fg(int fd, char* color);
+void ansi_fg(int fd, const char* color);
 
 void ansi_reset(int fd);
 

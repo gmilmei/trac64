@@ -11,7 +11,7 @@ void set_ansi(int enabled)
 }
 
 
-void ansi_fg(int fd, char* code)
+void ansi_fg(int fd, const char* code)
 {
     if (!ansi_enabled) return;
     char buf[16];

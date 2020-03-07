@@ -15,6 +15,8 @@ void io_out(int fd, CHAR* s, int len);
 
 CHAR io_char(int fd);
 
+void io_display(int fd, const char* color, const char* text);
+
 CHAR* read_file(char* filename);
 
 #endif
