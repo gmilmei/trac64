@@ -16,9 +16,9 @@ neutral_buf* neutral_buf_new();
 
 void neutral_buf_free(neutral_buf* nbuf);
 
-int neutral_buf_is_empty(neutral_buf* abuf);
+int neutral_buf_is_empty(neutral_buf* nbuf);
 
-int neutral_buf_clear(neutral_buf* abuf);
+void neutral_buf_clear(neutral_buf* nbuf);
 
 void neutral_buf_add(neutral_buf* nbuf, ECHAR c);
 

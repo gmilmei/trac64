@@ -20,6 +20,14 @@ void neutral_buf_free(neutral_buf* nbuf)
     free(nbuf);
 }
 
+void neutral_buf_clear(neutral_buf* nbuf)
+{
+    nbuf->top = -1;
+    nbuf->last_prim = 0;
+    nbuf->last_arg = 0;
+    nbuf->pc = 0;
+}
+
 void neutral_buf_add(neutral_buf* nbuf, ECHAR c)
 {
     nbuf->top++;

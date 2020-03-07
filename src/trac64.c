@@ -97,7 +97,9 @@ int run(CHAR* script)
                         // end of protection
                     }
                     else if (nbuf->pc < 0) {
-                        // TODO: unbalanced parentheses
+                        // unbalanced parentheses
+                        active_buf_clear(abuf);
+                        neutral_buf_clear(nbuf);
                     }
                     else {
                         neutral_buf_add(nbuf, c);
@@ -148,11 +150,13 @@ int run(CHAR* script)
                     if (prim) prim->fun(&trac, &args);
                 }
                 else {
-                    // TODO: unbalanced parentheses
+                    // unbalanced parentheses
+                    active_buf_clear(abuf);
+                    neutral_buf_clear(nbuf);
                 }
             }
             else if (c == '#') {
-                abuf->top--;
+                abuf->top--;                
                 if (abuf->top >= 0) {
                     CHAR c1 = abuf->buf[abuf->top];
                     if (c1 == '(') {
@@ -183,7 +187,8 @@ int run(CHAR* script)
                     }
                 }
                 else {
-                    // TODO
+                    // regular character
+                    neutral_buf_add(nbuf, c);
                 }
             }
             else if (c == ',') {
