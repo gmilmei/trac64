@@ -383,7 +383,18 @@ static int prim_eq(TRAC* trac, ARGS* args)
 
 static int prim_gr(TRAC* trac, ARGS* args)
 {
-    // TODO
+    CHAR* d1 = get_arg(args, 1);
+    CHAR* d2 = get_arg(args, 2);
+    CHAR* t1 = get_arg(args, 3);
+    CHAR* t2 = get_arg(args, 4);
+    long n1 = prim_get_number(d1);
+    long n2 = prim_get_number(d2);
+    if (n1 > n2) {
+        value(args->to, trac, t1, strlen(c(t1)));
+    }
+    else {
+        value(args->to, trac, t2, strlen(c(t2)));
+    }
     return 0;
 }
 
