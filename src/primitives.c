@@ -207,13 +207,44 @@ static int prim_cs(TRAC* trac, ARGS* args)
 
 static int prim_cn(TRAC* trac, ARGS* args)
 {
-    // TODO
+    CHAR* name = get_arg(args, 1);
+    CHAR* n1 = get_arg(args, 2);
+    CHAR* z = get_arg(args, 3);
+    long n;
+    int s = 0;
+    n = parse_number(n1, &s);
+    form* f = form_lookup(trac->forms, name);
+    if (f) {
+        string_buf* sbuf = string_buf_new(128);
+        int end = form_cn(f, n, s, sbuf);
+        if (end)
+            value(TO_ACTIVE, trac, z, strlen(c(z)));
+        else
+            value(args->to, trac, sbuf->buf, sbuf->len);
+        string_buf_free(sbuf);            
+    }
     return 0;
 }
 
 static int prim_in(TRAC* trac, ARGS* args)
 {
-    // TODO
+    CHAR* name = get_arg(args, 1);
+    CHAR* text = get_arg(args, 2);
+    CHAR* z = get_arg(args, 3);
+    form* f = form_lookup(trac->forms, name);
+    if (f) {
+        if (!*text || f->ptr == f->len) {
+            value(TO_ACTIVE, trac, z, strlen(c(z)));
+            return 0;
+        }
+        string_buf* sbuf = string_buf_new(128);
+        int end = form_in(f, text, sbuf);
+        if (end)
+            value(TO_ACTIVE, trac, z, strlen(c(z)));
+        else
+            value(args->to, trac, sbuf->buf, sbuf->len);
+        string_buf_free(sbuf);            
+    }    
     return 0;
 }
 
@@ -277,9 +308,8 @@ static int prim_dv(TRAC* trac, ARGS* args)
     long n1, n2;
     CHAR* p = prim_arith_get_args(trac, args, &n1, &n2);
     if (n2 == 0) {
-        // TODO
         CHAR* ex = get_arg(args, 3);
-        value(args->to, trac, ex, strlen(c(ex)));
+        value(TO_ACTIVE, trac, ex, strlen(c(ex)));
         return 0;
     }
     long n = n1/n2;
@@ -611,8 +641,8 @@ static int prim_default(TRAC* trac, ARGS* args)
 
 static int prim_help(TRAC* trac, ARGS* args)
 {
-    write(trac->fd_out, "\n", 1);
-    write(trac->fd_out, help_txt, help_txt_len);
+    if (write(trac->fd_out, "\n", 1) < 0) perror("prim_help");
+    if (write(trac->fd_out, help_txt, help_txt_len) < 0) perror("prim_help");
     return 0;
 }
 

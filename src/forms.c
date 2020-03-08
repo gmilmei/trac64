@@ -95,7 +95,7 @@ int form_cc(form* f, CHAR* c)
 }
 
 int form_cs(form* f, string_buf* sbuf)
-{    
+{
     if (f->ptr == f->len) return 1;
     int p = f->ptr;
     while (f->ptr < f->len && !echar_is_gap(f->buf[f->ptr])) {
@@ -107,6 +107,83 @@ int form_cs(form* f, string_buf* sbuf)
     if (f->ptr != f->len) f->ptr++;
     return 0;
 }
+
+int form_cn(form* f, long n, int s, string_buf* sbuf)
+{
+    // TODO: check correct ptr movement
+    if (n > 0 && s >= 0) {
+        if (f->ptr == f->len) return 1;
+        while (f->ptr < f->len && n > 0) {
+            ECHAR ec = f->buf[f->ptr];
+            if (echar_is_gap(ec)) {
+                f->ptr++;
+                continue;
+            }
+            string_buf_add(sbuf, ec_to_c(ec));
+            n--;
+            f->ptr++;
+        }
+    }
+    else if (n > 0 && s < 0) {
+        if (f->ptr == 0) return 1;
+        while (f->ptr > 0 && n > 0) {
+            ECHAR ec = f->buf[f->ptr-1];
+            if (echar_is_gap(ec)) {
+                f->ptr--;
+                continue;
+            }
+            string_buf_add(sbuf, ec_to_c(ec));
+            n--;
+            f->ptr--;
+        }
+        int len = sbuf->len;
+        for (int i = 0; i < len/2; i++) {
+            CHAR c = sbuf->buf[i];
+            sbuf->buf[i] = sbuf->buf[len-i-1];
+            sbuf->buf[len-i-1] = c;
+        }
+    }
+    else if (n == 0 && s >= 0) {
+        if (f->ptr == f->len) return 1;
+    }
+    else if (n == 0 && s < 0) {
+        if (f->ptr == 0) return 1;
+    }
+    return 0;
+}
+int form_in(form* f, CHAR* text, string_buf* sbuf)
+{
+    int tlen = strlen(c(text));
+    int ptr = f->ptr;
+    while (ptr < f->len) {
+        int p = ptr;
+        int tpos = 0;
+        while (p < f->len && tpos < tlen) {
+            ECHAR ec = f->buf[p];
+            if (echar_is_gap(ec)) break;
+            if (ec_to_c(ec) != text[tpos]) break;
+            p++;
+            tpos++;
+        }
+        if (tpos == tlen) {
+            int i = f->ptr;
+            while (i < ptr) {
+                ECHAR ec = f->buf[i];
+                if (echar_is_gap(ec)) {
+                    i++;
+                    continue;
+                }
+                string_buf_add(sbuf, ec_to_c(ec));
+                i++;
+            }
+            f->ptr = p;
+            return 0;
+        }
+        ptr++;
+    }
+    return 1;
+}
+
 
 void form_print(FILE* file, form* f)
 {

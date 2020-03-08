@@ -58,7 +58,7 @@ static void put_char(int fd, int c)
 {
     char buf[1];
     buf[0] = (char)c;
-    write(fd, buf, 1);
+    if (write(fd, buf, 1) < 0) perror("put_char");
 }
 
 static int back_char(int fd, string_buf* sbuf)
@@ -108,7 +108,7 @@ int io_in(int fd_in, int fd_out,
 
 void io_out(int fd, CHAR* s, int len)
 {
-    write(fd, s, len);
+    if (write(fd, s, len) < 0) perror("in_out");
 }
 
 CHAR io_char(int fd)
@@ -123,7 +123,7 @@ CHAR io_char(int fd)
 void io_display(int fd, const char* color, const char* text)
 {
     ansi_fg(fd, color);
-    write(fd, c(text), strlen(c(text)));
+    if (write(fd, c(text), strlen(c(text))) < 0) perror("io_display");
     ansi_reset(fd);
 }
 

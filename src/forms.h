@@ -34,6 +34,10 @@ int form_cc(form* f, CHAR* c);
 
 int form_cs(form* f, string_buf* sbuf);
 
+int form_cn(form* f, long n, int s, string_buf* sbuf);
+
+int form_in(form* f, CHAR* text, string_buf* sbuf);
+
 void form_delete(forms* fs, const CHAR* name);
 
 form* form_lookup(forms* fs, const CHAR* name);

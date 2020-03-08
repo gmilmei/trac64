@@ -19,11 +19,11 @@ void ansi_fg(int fd, const char* code)
     strcat(buf, "[38;5;");
     strcat(buf, code);
     strcat(buf, "m");
-    write(fd, buf, strlen(buf));
+    if (write(fd, buf, strlen(buf)) < 0) perror("ansi_fg");
 }
 
 void ansi_reset(int fd)
 {
     if (!ansi_enabled) return;
-    write(fd, "\x1B" "[39m", 5);
+    if (write(fd, "\x1B" "[39m", 5) < 0) perror("ansi_reset");
 }
