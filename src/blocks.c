@@ -10,13 +10,23 @@ static char header[] = {0x0, 0xE, 0x1, 'T', '6', '4'};
 
 static void fwrite_int(int n, FILE* file)
 {
-    fwrite(&n, sizeof(int), 1, file);
+    int nbytes = sizeof(int);
+    char buf[nbytes];
+    for (int i = nbytes-1; i >= 0; i--) {
+        buf[nbytes-i-1] = (n>>(8*i))&0xFF;
+    }
+    fwrite(buf, nbytes, 1, file);
 }
 
 static int fread_int(FILE* file)
 {
+    int nbytes = sizeof(int);
+    char buf[nbytes];
+    fread(buf, nbytes, 1, file);   
     int n = 0;
-    fread(&n, sizeof(int), 1, file);
+    for (int i = 0; i < nbytes; i++) {
+        n = (n<<8)|(buf[i]&0xFF);
+    }
     return n;
 }
 
@@ -41,13 +51,23 @@ static void fread_string(string_buf* sbuf, FILE* file)
 
 static void fwrite_echar(ECHAR ec, FILE* file)
 {
-    fwrite(&ec, sizeof(ECHAR), 1, file);
+    int nbytes = sizeof(ECHAR);
+    char buf[nbytes];
+    for (int i = nbytes-1; i >= 0; i--) {
+        buf[nbytes-i-1] = (ec>>(8*i))&0xFF;
+    }
+    fwrite(buf, nbytes, 1, file);
 }
 
 static ECHAR fread_echar(FILE* file)
 {
+    int nbytes = sizeof(int);
+    char buf[nbytes];
+    fread(buf, nbytes, 1, file);   
     ECHAR ec = 0;
-    fread(&ec, sizeof(ECHAR), 1, file);
+    for (int i = 0; i < nbytes; i++) {
+        ec = (ec<<8)|(buf[i]&0xFF);
+    }
     return ec;
 }
 
