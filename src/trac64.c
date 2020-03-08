@@ -210,6 +210,11 @@ int run(CHAR* script)
     return 0;
 }
 
+static void print_usage(FILE* file, char* prg)
+{
+    fprintf(file, "Usage: %s [-c] [-e] [-q] [-h] [-v] [-i FILE] [FILE]\n", prg);
+}
+
 int main(int argc, char* argv[])
 {
     int opt;
@@ -220,7 +225,7 @@ int main(int argc, char* argv[])
     CHAR* script = 0;
     char* alt_idling_script_file = 0;
     
-    while ((opt = getopt(argc, argv, "qcei:")) != -1) {
+    while ((opt = getopt(argc, argv, "vhqcei:")) != -1) {
         switch (opt) {
         case 'c':
             ansi = 1;
@@ -234,7 +239,16 @@ int main(int argc, char* argv[])
         case 'i':
             alt_idling_script_file = strdup(optarg);
             break;
+        case 'h':
+            print_usage(stdout, argv[0]);
+            exit(0);
+            break;
+        case 'v':
+            fprintf(stdout, "%s\n", VERSION_STRING);
+            exit(0);
         default:
+            print_usage(stderr, argv[0]);
+            exit(1);
             break;
         }
     }
@@ -249,7 +263,11 @@ int main(int argc, char* argv[])
     }
 
     if (alt_idling_script_file) {
-        // TODO
+        idling_script = read_file(alt_idling_script_file);
+        if (!idling_script) {
+            perror("trac64");
+            exit(1);
+        }
     }
     
     io_init();
