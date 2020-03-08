@@ -6,7 +6,7 @@ between 1959 and 1964 and implemented on a PDP-10. It influenced many
 later macro processors, such as M4.
 
 For more information, official definition and handbook, see
-[TRAC foundation](https://web.archive.org/web/20041011175826/http://www.tracfoundation.org/t64tech.htm) and [TRAC](https://en.wikipedia.org/wiki/TRAC_(programming_language%29) on Wikipedia.
+[TRAC foundation](https://web.archive.org/web/20041011175826/http://www.tracfoundation.org/t64tech.htm) and [TRAC](https://en.wikipedia.org/wiki/TRAC%5F%28programming_language%29) on Wikipedia.
 
 ## Installation
 
