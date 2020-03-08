@@ -166,35 +166,42 @@ static int prim_cl(TRAC* trac, ARGS* args)
 
 static int prim_cr(TRAC* trac, ARGS* args)
 {
-    if (args->n > 1) {
-        CHAR* name = get_arg(args, 1);
-        form* f = form_lookup(trac->forms, name);
-        if (f) f->ptr = 0;
-    }
+    CHAR* name = get_arg(args, 1);
+    form* f = form_lookup(trac->forms, name);
+    if (f) f->ptr = 0;
     return 0;
 }
 
 static int prim_cc(TRAC* trac, ARGS* args)
 {
-    if (args->n > 1) {
-        CHAR* name = get_arg(args, 1);
-        CHAR* z = get_arg(args, 2);
-        form* f = form_lookup(trac->forms, name);
-        if (f) {
-            CHAR c;
-            int end = form_cc(f, &c);
-            if (end)
-                value(args->to, trac, z, strlen(c(z)));
-            else
-                value(args->to, trac, &c, 1);
-        }
+    CHAR* name = get_arg(args, 1);
+    CHAR* z = get_arg(args, 2);
+    form* f = form_lookup(trac->forms, name);
+    if (f) {
+        CHAR c;
+        int end = form_cc(f, &c);
+        if (end)
+            value(TO_ACTIVE, trac, z, strlen(c(z)));
+        else
+            value(args->to, trac, &c, 1);
     }
     return 0;
 }
 
 static int prim_cs(TRAC* trac, ARGS* args)
 {
-    // TODO
+    CHAR* name = get_arg(args, 1);
+    CHAR* z = get_arg(args, 2);
+    form* f = form_lookup(trac->forms, name);
+    if (f) {
+        string_buf* sbuf = string_buf_new(128);
+        int end = form_cs(f, sbuf);
+        if (end)
+            value(TO_ACTIVE, trac, z, strlen(c(z)));
+        else
+            value(args->to, trac, sbuf->buf, sbuf->len);
+        string_buf_free(sbuf);
+    }
     return 0;
 }
 

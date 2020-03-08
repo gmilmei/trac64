@@ -15,7 +15,7 @@ install: all
 
 tar: clean
 	mkdir -p ${NAME}
-	cp -a AUTHORS LICENSE Makefile README.md src man ${NAME}
+	cp -a AUTHORS LICENSE Makefile man README.md src tests ${NAME}
 	tar zcf ${NAME}.tar.gz --owner=0 --group=0 ${NAME}
 	rm -rf ${NAME}
 

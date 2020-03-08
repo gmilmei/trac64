@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "common.h"
+#include "string_buf.h"
 
 typedef struct {
     CHAR* name;
@@ -30,6 +31,8 @@ CHAR* form_get(form* f, CHAR** fargs, int fnargs);
 void form_ss(form* f, CHAR** fargs, int fnargs);
 
 int form_cc(form* f, CHAR* c);
+
+int form_cs(form* f, string_buf* sbuf);
 
 void form_delete(forms* fs, const CHAR* name);
 

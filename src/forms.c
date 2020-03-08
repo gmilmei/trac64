@@ -65,7 +65,7 @@ void form_ss(form* f, CHAR** fargs, int fnargs)
                 if (arg[l] != ec_to_c(f->buf[i+l])) goto K;
                 l++;
             }
-            if (i+l < len) {
+            if (!arg[l]) {
                 new_buf[j++] = echar_set_number(echar_set_gap(0), k);
                 i += l-1;
                 break;
@@ -92,6 +92,20 @@ int form_cc(form* f, CHAR* c)
         return 0;
     }
     return 1;
+}
+
+int form_cs(form* f, string_buf* sbuf)
+{    
+    if (f->ptr == f->len) return 1;
+    int p = f->ptr;
+    while (f->ptr < f->len && !echar_is_gap(f->buf[f->ptr])) {
+        f->ptr++;
+    }
+    for (int i = p; i < f->ptr; i++) {
+        string_buf_add(sbuf, ec_to_c(f->buf[i]));
+    }
+    if (f->ptr != f->len) f->ptr++;
+    return 0;
 }
 
 void form_print(FILE* file, form* f)

@@ -10,7 +10,6 @@ void set_ansi(int enabled)
     ansi_enabled = enabled;
 }
 
-
 void ansi_fg(int fd, const char* code)
 {
     if (!ansi_enabled) return;
