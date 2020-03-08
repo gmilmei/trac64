@@ -1,11 +1,10 @@
-TEST_FILES=\
-	test_ad \
-	test_dv
+TESTS_ARITH=ad su ml dv
+TESTS=${TESTS_ARITH}
 
 RUN_TEST=./run_test.sh
 
 check:
-	@for test_file in $(TEST_FILES); do $(RUN_TEST) $$test_file; done
+	@for test in $(TESTS); do $(RUN_TEST) test_$$test; done
 
 clean:
 	rm -f *.out

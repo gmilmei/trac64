@@ -1,6 +1,6 @@
 #(ps,
   #(dv,23,2)
-  ##(dv,10,0,(division by zero))
+  ##(dv,10,0,((division by zero)))
   (
 ))
 #(hl)
