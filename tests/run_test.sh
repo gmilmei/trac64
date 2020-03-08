@@ -6,7 +6,7 @@ TEST_OUT=${TEST}.out
 $TRAC $TEST > ${TEST_OUT}
 if cmp ${TEST_OK} ${TEST_OUT}
 then
-    echo ${TEST}: [32mPASSED
+    echo ${TEST}: [32mPASSED[39m
 else
-    echo ${TEST}: [31mFAIL
+    echo ${TEST}: [31mFAIL[39m
 fi

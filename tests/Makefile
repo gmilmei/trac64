@@ -1,4 +1,7 @@
-TEST_FILES=test_ad
+TEST_FILES=\
+	test_ad \
+	test_dv
+
 RUN_TEST=./run_test.sh
 
 check:
