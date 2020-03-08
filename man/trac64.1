@@ -30,5 +30,165 @@ do not print the banner
 \fB\-i\fR \fI\,FILE\/\fR
 use the content of \fI\,FILE\/\fR as the idling script
 
+.SH PRIMITIVES
+
+.SS Input and output control primitives
+
+.TP
+\fBPS\fR,\fIt1\fR
+print string
+
+.TP
+\fBRS\fR
+read string
+
+.TP
+\fBCM\fR,\fIt1\fR
+change meta
+
+.TP
+\fBRC\fR
+read character
+
+.SS String storage and deletion primitives
+
+.TP
+\fBDS\fR,\fIn1\fR,\fIt1\fR
+define string
+
+.TP
+\fBDD\fR,\fIn1\fR,\fIn2\fR,...
+delete definition
+
+.TP
+\fBDA\fR
+delete all
+
+.SS Primitives for the creation of text macros
+
+.TP
+\fBSS\fR,\fIn1\fR,\fIt1\fR,\fIt2\fR,...
+segment string
+
+.SS Call primitive
+
+.TP
+\fBCL\fR,\fIn1\fR,\fIt1\fR,\fIt2\fR,...
+call
+
+.SS Partial call primitives
+
+.TP
+\fBCR\fR,\fIn1\fR
+call restore
+
+.TP
+\fBCC\fR,\fIn1\fR,\fIz\fR
+call character
+
+.TP
+\fBCS\fR,\fIn1\fR,\fIz\fR
+call segment
+
+.TP
+\fBCN\fR,\fIn1\fR,\fId1\fR,\fIz\fR
+call N
+
+.TP
+\fBIN\fR,\fIn1\fR,\fIt1\fR,\fIz\fR
+initial
+
+.SS Arithmetic primitives
+
+.TP
+\fBAD\fR,\fId1\fR,\fId2\fR,\fIz\fR
+add
+
+.TP
+\fBSU\fR,\fId1\fR,\fId2\fR,\fIz\fR
+subtract
+
+.TP
+\fBML\fR,\fId1\fR,\fId2\fR,\fIz\fR
+multiply
+
+.TP
+\fBDV\fR,\fId1\fR,\fId2\fR,\fIz\fR
+divide
+
+.SS Boolean primitives
+
+.TP
+\fBBU\fR,\fIb1\fR,\fIb2\fR
+Boolean union
+
+.TP
+\fBBI\fR,\fIb1\fR,\fIb2\fR
+Boolean intersection
+
+.TP
+\fBBC\fR,\fIb1\fR
+Boolean complement
+
+.TP
+\fBBR\fR,\fId1\fR,\fIb1\fR
+Boolean rotate
+
+.TP
+\fBBS\fR,\fId1\fR,\fIb1\fR
+Boolean shift
+
+.SS Decision primitives
+
+.TP
+\fBEQ\fR,\fIt1\fR,\fIt2\fR,\fIt3\fR,\fIt4\fR
+string equality
+
+.TP
+\fBGR\fR,\fId1\fR,\fId2\fR,\fIt1\fR,\fIt2\fR
+greater than
+
+.SS Auxiliary storage primitives
+
+.TP
+\fBSB\fR,\fIn1\fR,\fIn2\fR,...
+store block
+
+.TP
+\fBFB\fR,\fIn1\fR
+fetch block
+
+.TP
+\fBEB\fR,\fIn1\fR
+erase block
+
+.SS Diagnostic primitives
+
+.TP
+\fBLN\fR,\fIt1\fR
+list names
+
+.TP
+\fBPF\fR,\fIn1\fR
+print form
+
+.TP
+\fBTN\fR
+trace on
+
+.TP
+\fBTF\fR
+trace off
+
+.SS Housekeeping primitives
+
+.TP
+\fBHL\fR
+halt
+
+.TP
+\fBMO\fR,\fIt1\fR
+mode
+
 .SH AUTHOR
 Written by Gérard Milmeister
