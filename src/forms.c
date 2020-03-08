@@ -117,7 +117,7 @@ forms* forms_new(int max)
 
 void forms_free(forms* fs)
 {
-    // TODO
+    // TODO: currently not used
 }
 
 void forms_clear(forms* fs)
@@ -202,7 +202,6 @@ void form_set(forms* fs, form* f)
     fs->size++;
     forms_sort(fs);
 }
-
 
 void form_define(forms* fs, const CHAR* name, const CHAR* s, int len)
 {

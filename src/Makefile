@@ -25,7 +25,7 @@ help.h: help.txt
 clean:
 	rm -f ${OBJS} trac64 TAGS
 
-etags:
+tags:
 	etags *.c *.h
 
 run: clean etags trac64

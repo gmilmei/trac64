@@ -19,6 +19,10 @@ tar: clean
 	tar zcf ${NAME}.tar.gz --owner=0 --group=0 ${NAME}
 	rm -rf ${NAME}
 
+check: trac64
+	make -C tests check
+
 clean:
 	make -C src clean
+	make -C tests clean
 	rm -fr ${NAME}
