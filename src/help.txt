@@ -55,14 +55,14 @@ Auxiliary storage primitives
 * FB,n1             fetch block
 * EB,n1             erase block
 
-Diagnostic
+Diagnostic primitives
 
 * LN,t1             list names
 * PF,n1             print form
 * TN                trace on
 * TF                trace off
 
-Housekeeping
+Housekeeping primitives
 
 * HL                halt
 * MO,t1             mode
