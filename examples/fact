@@ -1,0 +1,9 @@
+#(ds,fact,(
+  #(eq,X,0,
+    1,(
+      #(ml,X,#(fact,#(su,X,1)))
+    )
+   )
+  )
+ )
+#(ss,fact,X)

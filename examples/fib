@@ -1,0 +1,28 @@
+#(ds,fib,(
+  #(eq,X,0,0)
+  #(eq,X,1,1)
+  #(gr,X,1,(
+      #(ad,#(fib,#(su,X,1)),#(fib,#(su,X,2)))
+    )
+   )
+  )
+ )
+#(ss,fib,X)
+
+#(ds,nl,(#(ps,(
+))))
+
+#(ds,printfib,(
+  #(gr,X,Y,,(
+      #(ps,(Fib[)X(] = )#(fib,X))
+      #(nl)
+      #(printfib,#(ad,X,1),Y)
+    )
+   )
+  )
+ )
+#(ss,printfib,X,Y)
+
+#(printfib,0,20)
+
+#(hl)
