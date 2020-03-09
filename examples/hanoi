@@ -1,0 +1,27 @@
+#(ps,,(Towers of Hanoi by John Cowan (1994)))
+
+#(ds,nl,(#(ps,(
+))))
+
+#(ds,the other,(##(su,6,##(ad,this,that))))
+#(ss,the other,this,that)
+
+#(ds,hanoi,(
+  #(gr,N,1,
+    (#(cl,hanoi,this,#(cl,the other,this,that),##(su,N,1))
+     #(nl)
+     #(ps,(from this to that))
+     #(cl,hanoi,#(cl,the other,this,that),that,##(su,N,1))
+    ),
+    (#(nl)
+     #(ps,(from this to that))
+    )
+   )
+  )
+ )
+#(ss,hanoi,this,that,N)
+
+#(hanoi,1,3,3)
+
+#(nl)
+#(hl)
