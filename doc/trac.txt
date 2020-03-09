@@ -1,0 +1,557 @@
+				A DESCRIPTION OF TRAC
+				Copyright 1994 by John Cowan
+				All rights reserved.
+
+The TRAC programming language was designed and implemented by C. N. Mooers
+and L. P. Deutsch, and described in the following two articles:
+
+	Mooers and Deutsch, "TRAC: A text handling language."  Proc. A.C.M.
+	20th National Conference (1965) pp. 229-46
+
+	Mooers.  "TRAC, A procedure-describing language for the reactive
+	typewriter."  CACM 9:3 (1966) pp. 215-19.
+
+I have not read either of these articles.  The information herein is drawn
+from the book >Macro Processors<, by A. J. Cole (Cambridge University Press,
+1976, ISBN 0-521-29024-4).
+
+Disclaimer:  At one time, TRAC was a trademark within the U.K. and possibly
+other countries.  Given the rate of change in the software industry in the
+past thirty years, I doubt whether the trademark is still being defended
+in 1994.  However, if so, it is hereby acknowledged.
+
+
+1. A Brief Tour of TRAC
+
+TRAC is in essence a macro-processing language: like the well-known
+C preprocessor `cpp', it reads its input and passes through everything
+to its output, unchanged, except what is recognized as a macro
+call.  Macro calls, which may have arguments, are evaluated and
+replaced by their results.  For each macro, there are two ways to
+invoke it, active invocation and neutral invocation.
+
+Active invocation means that the result of the macro call is rescanned to
+see if it contains further macro calls.  Neutral invocation means that the
+result is not rescanned but is sent to the output.  Macro calls may be
+nested within macro calls, and active and neutral invocations may be freely
+intermixed.  Further examples should help to make this distinction clearer.
+
+Syntactically, every TRAC macro invocation looks like:
+
+	#(name,arg,arg,...)
+
+for an active invocation, or
+
+	##(name,arg,arg,...)
+
+for a neutral invocation.  The ellipses (`...') are not part of the syntax,
+but are used to show that there may be any number of arguments, including
+zero.  It is important to remember that in TRAC, an argument is a literal
+string of characters, which may of course contain calls on other macros.
+When the descriptions below speak of `the first argument' or the like, what
+is meant is literally the characters (after macro substitution) that appear
+after the first comma and up to the next comma or right parenthesis.
+
+Consider the following TRAC program:
+
+	#(ps,#(rs))
+
+Here the `ps' macro is invoked with a single argument.  The effect of this
+macro is to print its argument on the standard output.  So a first cut at
+what this program does is that it prints `#(rs)'.  In fact, however, its
+argument contains another macro, which must be invoked first, the `rs' macro.
+The effect of `rs' is to read characters from the standard input up to an
+apostrophe (why an apostrophe? That's how TRAC works!) and return them
+as a string.
+
+A second cut at the meaning of this program, then, is that it is like `cat';
+it reads the standard input (at least as far as the first apostrophe) and
+prints what it reads.  This is correct as far as it goes, but note the
+active invocation of `rs'.  What `rs' reads and returns is rescanned by
+TRAC, due to the active invocation, and any macros contained in it are
+invoked.  So what we really have here is a TRAC interpreter written in TRAC!
+(In fact, the real TRAC interpreter loads this program initially and whenever
+it has nothing else to do; therefore, running TRAC has the effect of reading
+strings delimited by apostrophes from the standard input, invoking any
+macros, and sending the results to the standard output.)
+
+The true version of `cat' (up to the first apostrophe, at least) is:
+
+	#(ps,##(rs))
+
+The neutral invocation of `rs' prevents its result from being rescanned
+for macros, and so the input is simply printed.
+
+TRAC also allows input text to be quoted, to prevent expanding any macros
+in it.  This is done by enclosing the text in parentheses.  Everything from
+a `(' not preceded by `#' up to the matching ')' will not be scanned for
+macro invocations.  (Of course, the text must be balanced with respect
+to parentheses.)  To print the literal text `#(rs)', use the program:
+
+	#(ps,(#(rs)))
+
+Any uses of `#' not followed by `(' or `#(', and random appearances of `,'
+and `)', are not treated as special.
+
+For convenience in typing, all tab and newline characters and all spaces
+appearing immediately after an argument-separating comma are removed by
+TRAC from the input stream.  This does not apply to tabs, newlines, or
+spaces that are quoted within parentheses.
+
+The list of TRAC macros is fixed and cannot be extended.  This is no real
+restriction, however, as the user may create objects called `forms' that
+serve the purposes of user-written macros in languages like `cpp'.  Forms
+are defined with the `ds' and `ss' macros, and invoked (possibly with
+arguments) using the `cl' macro.  TRAC's two-letter macro names descend
+from the days of slow TTYs; the above names stand for `define string',
+`segment string', and `call' respectively.  Forms may have names of any length,
+even including zero (a form with null name is often useful for error
+recovery).
+
+
+2. The Original TRAC Macros
+
+Here is a complete list of all the TRAC macros.  The two-letter form
+shown first is the standard Mooers/Deutsch name; the longer form shown
+second is also accepted by the Perl implementation, and is intended to
+enhance the readability of TRAC programs. In retrocomputing implementations,
+backward compatibility is a laudable goal, but so is adaptation to the
+modern world, insofar as the spirit of the language is preserved.
+As a matter of convention, all macros are shown in active-invocation form,
+but a neutral-invocation form (with `##' instead of `#') also exists.
+
+The following descriptions carefully differentiate between the `result' of
+a macro, which is the string it returns, and the `effect' of a macro, which
+is anything else it does other than returning a result.  For example, `ps'
+has the effect of printing its argument on the standard output, but its
+result is always the null string.
+
+Note that TRAC interpreters always treat missing arguments as the null
+string.  Extra arguments may be supplied, and any macros in them will be
+expanded (with possible effects), but the values are ignored.
+Unknown macros are ignored; the result is the null string.
+
+
+2.1. Basic I/O
+
+The following macros provide basic TRAC string I/O, and have been partly
+explained above.  See Section 3 for some extensions made in the
+Perl implementation.
+
+	#(rs)
+	#(read string)
+
+Reads characters from the standard input up to and including the current
+system meta character (see `cm' below).  The meta character is discarded,
+and all other characters are concatenated into a string and returned.
+At end of file, the null string is returned (but this is
+not distinguishable from the null string resulting from no characters
+preceding the meta character).
+
+	#(ps,any text)
+	#(print string,any text)
+
+Prints its first argument on the standard output.  The result is always the
+null string.
+
+	#(rc)
+	#(read character)
+
+Reads a single character from the standard input and returns it.
+When reading from a terminal, this macro does not put the terminal into
+character-at-a-time mode.  The meta character may be returned like any other.
+At end-of-file, the result is the null string.
+
+	#(cm,X)
+	#(change meta,X)
+
+Changes the meta character to be the first character of the first argument.
+The remaining characters of the first argument are ignored.
+The result is the previous meta character (this is an extension peculiar to
+the Perl implementation; the traditional implementation returned the null
+string).  This result allows saving and restoring the meta character.
+A common value for the meta character is the newline character.
+
+
+2.2 Forms And The Form Store
+
+The following macros serve to manipulate a data structure internal to the
+TRAC interpreter, known as the `form store'.  Essentially, this is just a
+list of strings called `forms' each of which has a unique name (another
+string).  However, forms may contain some special codes which are not
+characters.  (In the Perl implementation, these are represented by non-ASCII
+characters in the range 0200-0377; so Perl TRAC is not `8-bit clean'.)
+In addition, each form has a pointer associated with it, called the
+`form pointer', which can point to any character in the
+form.  This is used to manipulate parts of forms using some of the macros
+explained below.
+
+	#(ds,name,text)
+	#(define string,name,text)
+
+Causes the second argument to become a form in the form store with a name
+given by the first argument.  If the second argument contains macro calls
+which are not to be evaluated now (at definition time), then the whole argument
+should be protected by parentheses.  If there is an existing form in the form
+store with the same name, it is quietly removed.  This characteristic of
+quietly removing old versions of things is maintained throughout TRAC.
+Note particularly that the null string is a valid form name.
+The result of `ds' is always the null string.
+
+	#(ss,name,arg1,arg2,...)
+	#(segment string,name,arg1,arg2,...)
+
+As in Section 1, the ellipsis is not part of the syntax, but indicates that
+the `ss' macro may have any number of arguments from one on up.  This
+macro alters the existing form named `name' (if no such form exists, nothing
+is done) by scanning it for all instances of the second argument and
+replacing every instance with a non-character which is externally represented
+(by the `sb' and `pf' macros) as `\0\'.  The form is then scanned again for
+all instances of the third argument, which are replaced by the non-character
+represented as '\1\'.  This process is repeated until there are no more
+arguments to `ss'.  The result is always the null string.
+
+The `ds' and `ss' macros are used jointly to define the equivalent of
+user-written macros in TRAC.  The user writes a piece of TRAC code using
+`ds', employing any desired strings as formal parameters.  The `ss' macro
+then converts the user-chosen strings into internal markers.  See
+Section 5 for further examples.
+
+	#(cl,name,arg1,arg2,...)
+	#(call,name,arg1,arg2,...)
+
+The result is the form named by the first argument.  Any markers in the form
+are replaced by the second through last arguments.  If an argument is not
+provided, the corresponding marker is replaced by the null string, so that
+no markers are ever returned from `cl'.  This is the mechanism for invoking
+user-written macros defined by `ds' and `ss'.
+
+	#(dd,name1,name2,...)
+	#(delete definition,name1,name2)
+
+Deletes any forms from the form store whose names are given as arguments.
+Arguments not corresponding to names are silently ignored, as usual.
+Returns the null string.
+
+	#(da)
+	#(delete all)
+
+Deletes all forms from the form store.  Returns the null string.
+
+	#(cs,name,default)
+	#(call segment,name,default)
+
+A `segment' is defined as the portion of a form between markers.  The `cs'
+macro returns the segment currently pointed to by the form pointer.  If
+the form pointer is not pointing to the beginning of a segment, it returns
+all the characters between the form pointer and the next marker.
+
+This macro is the first to have a `default' argument.  All default arguments
+are handled in the same way.  When an exceptional event occurs, the default
+argument is returned as the result of the macro, and the macro is treated
+as if it had been invoked actively, so that the default argument will be
+rescanned for macro calls.  In the case of `cs', the default argument is
+returned as the result when there are no more segments to return.
+
+	#(cc,name,default)
+	#(call character,name,default)
+
+The `cc' macro is very similar to the `cs' macro, but returns the character
+indicated by the form pointer, and leaves the form pointer pointing to the
+next character of the form.  The default argument is returned if there are
+no more characters, or if the next character is a marker.
+
+	#(in,name,string,default)
+	#(initial,name,string,default)
+
+This macro scans the form named by the first argument, starting at the
+form pointer for that form, to try to find the string which is the second
+argument.  If it is found, the form pointer is left pointing after the
+matched string, and the null string is returned.  If not, the default
+argument is returned.
+
+	#(cr,name)
+	#(call reset,name)
+
+Resets the form pointer associated with the form whose name is the first
+argument to the beginning of the form.  Returns the null string.
+
+
+2.3. TRAC Arithmetic
+
+TRAC has simple built-in arithmetic macros.  Most of these accept TRAC
+numbers as arguments.  A TRAC number is a string with a particular form:
+an optional sign, plus or minus; followed by any number of non-digits, called
+the `prefix', followed by any number of digits.  If there are no digits, the
+value is zero.  (The traditional implementation allowed digits in the prefix
+as long as they were followed by at least one non-digit.)  TRAC numbers are
+always interpreted as signed integers.  The prefix is ignored for computational
+purposes, but the prefix of the result is the same as the prefix of the
+first numeric argument.  (The prefix of the second argument, if any, is
+always discarded.)
+
+	#(ad,n1,n2,default)
+	#(+,n1,n2,default)
+
+Returns the sum of the first two arguments, unless overflow results, in which
+case the default argument is returned under the usual rules.
+
+	#(su,n1,n2,default)
+	#(-,n1,n2,default)
+
+Returns the first argument minus the second argument, unless overflow
+results, in which case the default argument is returned.
+
+	#(ml,n1,n2,default)
+	#(*,n1,n2,default)
+
+Returns the product of the first two arguments, unless overflow results, in
+which case the default argument is returned.
+
+	#(dv,n1,n2,default)
+	#(/,n1,n2,default)
+
+Returns the first argument divided by the second argument, with any
+remainder discarded (truncation is toward zero), unless overflow results,
+or the second argument is zero, in which case the default argument is returned.
+
+	#(eq,string1,string2,then,else)
+	#(=,string1,string2,then,else)
+
+Compares the first two arguments for character-by-character equality.
+If they are equal, the third argument is returned; otherwise, the fourth
+argument is returned.  This macro looks weak until it is remembered that the
+third and fourth arguments may contain macro calls protected by parentheses,
+which will then be rescanned on return.
+
+	#(gr,string1,string2,then,else)
+	#(<,string1,string2,then,else)
+
+Compares the first two arguments, which should be numeric, for numerical
+magnitude.  If the first argument is greater than the second argument,
+the third argument is returned; otherwise, the fourth argument is returned.
+
+	#(bu,n1,n2)
+	#(|,n1,n2)
+
+Returns the bitwise boolean union (logical OR) of the first two arguments
+considered as numbers.
+
+	#(bi,n1,n2)
+	#(&,n1,n2)
+
+Returns the bitwise boolean intersection (logical AND) of the first two
+arguments considered as numbers.
+
+	#(bc,n1)
+	#(~,n1)
+
+Returns the bitwise boolean complement (logical NOT) of the first argument,
+considered as a number.
+
+
+2.4. Miscellaneous Macros
+
+	#(tn)
+	#(trace on)
+
+Causes TRAC to print the name and arguments of each macro just before it
+is invoked, and wait for user input.  A newline will proceed; the interrupt
+character (typically DEL or ^C) will abort execution and return to the
+main TRAC interpreter loop.  The result is the null string.
+
+	#(tf)
+	#(trace off)
+
+Turns off tracing mode.  The result is the null string.
+
+	#(ln)
+	#(list names)
+
+Returns a list, separated by spaces, of all the names of the forms in the
+form store as the result.
+
+	#(pf,name)
+	#(print form,name)
+
+Prints the form named by the first argument on the standard output.
+Markers are printed using the `\n\' format, where `n' is a sequence of
+digits.  Actual backslashes are printed as `\\'.
+
+	#(sb,pathname,name1,name2,...)
+	#(save block,pathname,name1,name2,...)
+
+Saves the forms named by the second and succeeding arguments into the
+file specified by the first argument.  The syntax of a filename depends on
+the local environment.  (As an extension, the Perl implementation tags
+each form saved with the pathname; a later `sb' invocation with a single
+argument saves the same forms that were saved previously.)  Nonexistent
+form names are quietly skipped.
+
+The format of the file is as follows:  a form name (with any backslashes
+printed as `\\'), followed by '\=', followed by the form (as printed by
+the `pf' macro), followed by '\;' and a newline.  Either the name or the
+form itself may contain newlines, so the `\=' and '\;' are critical; the
+newline after '\;' helps conventional text editors.
+
+	#(fb,pathname)
+	#(fetch block,pathname)
+
+Reads the file named by the first argument, which should be in the format
+produced by `sb', into the form store, eliminating any similarly named
+forms already present there.  (As an extension, the Perl implementation
+tags each form read in with the filename; these forms can then be saved
+with a `sb' having just one argument, the same filename.)  The result
+is the null string.
+
+	#(eb,filename)
+	#(erase block,filename)
+
+Erases the file named by the first argument.  This may be any file, not
+just one written by `sb', although that is the intended use.
+
+
+3. Extensions In The Perl Implementation
+
+The Perl implementation of TRAC adds a few new macros, and a few extra
+arguments to traditional macros, to aid the use of TRAC in modern (i.e.
+Unix-like) environments.  The `default' argument has the usual meaning.
+
+	#(oi,handle,filename,default)
+	#(open input,handle,filename,default)
+
+Opens the file named by the second argument for input, associating with it
+the handle (any string) given by the first argument.
+There is a system-defined limit on how many handles may be open simultaneously.
+The handle STDIN refers to the standard input.  The handles `' (the null
+string) and `ARGV' should be avoided due to conflicts with Perl.
+The result is the null string, unless the file cannot be opened, in which
+case the result is the default argument (with the usual side effect of making
+the invocation an active one).
+
+	#(oo,handle,filename,default)
+	#(open output,handle,filename,default)
+
+Opens the file named by the second argument for output (creating it if it
+does not exist, or truncating it to zero length if it does), associating it
+with the handle (any string) given by the first argument.
+There is a system-defined limit on how many handles may be open simultaneously.
+The handles STDOUT and STDERR refer to the standard output and the standard
+error respectively.  The handles `' (the null string) and `ARGV' should be
+avoided due to conflicts with Perl.
+The result is the null string, unless the file cannot be opened, in which
+case the result is the default argument (with the usual side effect of making
+the invocation an active one).
+
+	#(oa,handle,filename,default)
+	#(open append,handle,filename,default)
+
+Exactly the same as `oo', except that if the file exists, its contents are
+appended to rather than overwritten.
+
+	#(cf,handle)
+	#(close file,handle)
+
+Closes the file named by the first argument.  The result is the null string.
+
+	#(rs,handle,default)
+	#(read string,handle,default)
+
+If the traditional `rs' macro is given an argument, it is taken to be the
+name of a handle to read from, rather than reading from the standard input.
+A second argument is a default argument, returned on end of file.
+
+	#(rc,handle)
+	#(read character,handle)
+
+If the traditional `rc' macro is given an argument, it is taken to be the
+name of a handle to read from, rather than reading from the standard input.
+
+	#(cm,X,handle)
+	#(change meta,X,handle)
+
+There is a separate meta character associated with each input handle.
+Specifying a second argument to the traditional `cm' macro changes the
+meta character for that handle and returns the meta character associated
+with the handle.  Initially, the meta character for STDIN is the
+apostrophe.  For all other handles, the currently set STDIN meta character
+is copied when the handle is opened.
+
+	#(ps,any text,handle)
+	#(print string,any text,handle)
+
+If the traditional `ps' macro is given a second argument, it is taken to be
+an output handle to print to, rather than using the standard output.
+
+	#(ld,filename,default)
+	#(load,filename,default)
+
+Returns the contents of the entire file whose name is specified by the
+first argument.  The file will be loaded into memory first, so beware!
+This is mostly useful for loading files containing TRAC code.
+If the file cannot be opened or cannot be read, the default argument is
+returned instead.
+
+	#(sy,any text)
+	#(system,any text)
+
+Causes the first argument to be passed to the system for execution.
+The result is the 16-bit value passed back by the wait(2) system call,
+expressed as a TRAC number.
+
+	#(ex)
+	#(exit)
+
+Causes an immediate exit from TRAC.  No result is returned.
+
+	#(#,any text)
+
+This macro has null result and null effect, and can be used to insert
+comments (properly balanced as to parentheses, of course).
+
+Finally, there are two special forms in the form store, named ARGV and ENV.
+The ARGV form contains the arguments passed when TRAC is invoked, separated
+by the marker `\0\'.  The ENV form contains the environment as name-value
+pairs; each pair is separated by the marker `\0\', and each name is
+separated from its following value by the marker `\1\'.  The ENV form is
+not in any predictable order.  These forms may be manipulated freely like
+any other forms.
+
+
+4.  An Example:  Towers Of Hanoi
+
+This example, found on pp. 72-4 of Cole (see Section 1), solves the Towers
+of Hanoi problem: see any elementary programming text for an explanation
+of the problem and a typical recursive solution.
+
+	#(ds,the other,(##(su,6,##(ad,this,that))))
+
+This creates a form named `the other' with contents `##(su,6,##(ad,this,that))'.
+Note that the second-from-outermost parentheses protect the `su' and `ad'
+macro calls from invocation at this time.
+
+	#(ss,the other,this,that)
+
+This segments the form named `the other', replacing `this' and `that' with
+the markers `\0\' and `\1\' respectively.  When invoked below, `the other'
+will accept two numeric arguments representing spindles (which are numbered
+1, 2, 3) and return the number of the other spindle.
+
+	#(ds,hanoi,(#(gr,N,1,
+	(#(cl,hanoi,this,#(cl,the other,this,that),##(su,N,1))
+		#(ps,from this to that(
+))
+		#(cl,hanoi,#(cl,the other,this,that),that,##(su,N,1))),
+	(#(ps,from this to that(
+)))	)))
+	#(ss,hanoi,this,that,N)
+
+This code defines `hanoi' as a segmented form, with parameters `this' and
+`that' (the spindle numbers to move from and to, respectively) and `N', the
+number of disks to move.  The body is a (protected) invocation of the `gr'
+macro.  If the number of disks is greater than 1, move N - 1 disks from
+`this' to the other (using the form `the other' to compute its spindle
+number), move one disk from `this' to 'that', and then move N - 1 disks
+from the other to `that'.  If N is 1, just move the one disk directly.
+The `ps' calls print the moves made.  Note the quoted newline at the
+end of each `ps' call.
